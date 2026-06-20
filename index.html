@@ -9,181 +9,122 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap');
   :root{
-    --bg: #FBF3F0;
-    --bg-soft: #F7E9E4;
-    --card: #FFFFFF;
-    --card-border: #F0DAD2;
-    --ink: #4A3439;
-    --ink-dim: #A98E8C;
-    --accent: #C97B84; /* rosa terracota */
-    --accent-soft: #F6DDE1;
-    --green: #8FAE8C;
-    --red: #D98679;
-    --pix: #8FAE8C;
-    --credito: #C97B84;
-    --debito: #9BA8C9;
-    --dinheiro: #D9A05B;
-    --crediario: #B48FC4;
+    --bg: #1E0A16;
+    --bg-soft: #2A0F1E;
+    --card: #321427;
+    --card-border: #4D2238;
+    --ink: #F6ECDD;
+    --ink-dim: #B79A97;
+    --accent: #E8B94C;
+    --accent-soft: #4A3318;
+    --green: #7FBF8F;
+    --red: #E08C7D;
+    --pix: #7FBF8F;
+    --credito: #E8B94C;
+    --debito: #8FAEDB;
+    --dinheiro: #E0A85C;
+    --crediario: #C99BDE;
+    --whats: #4CAF7D;
     --radius: 18px;
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:var(--font-body);
-    padding-bottom: 90px;
-    min-height:100vh;
-  }
-  header.top{
-    padding: 18px 18px 14px;
-    background: linear-gradient(180deg, var(--bg-soft), var(--bg));
-    border-bottom: 1px solid var(--card-border);
-    position: sticky; top:0; z-index:50;
-  }
-  .brand{ display:flex; align-items:center; justify-content:space-between; }
-  .brand h1{
-    font-family: var(--font-display); font-size:20px; font-weight:600; margin:0;
-    letter-spacing:0.2px;
-  }
-  .brand .sub{ font-size:11px; color:var(--ink-dim); margin-top:2px; letter-spacing: 0.5px; text-transform:uppercase;}
-  .user-pill{
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); padding-bottom:90px; min-height:100vh; }
+  header.top{ padding:14px 18px 12px; background:linear-gradient(180deg, var(--bg-soft), var(--bg)); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .brand{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .logo-wrap{ width:46px; height:46px; border-radius:12px; overflow:hidden; flex-shrink:0; box-shadow:0 3px 10px rgba(74,30,50,0.25); }
+  .logo-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .header-text{ display:flex; align-items:center; gap:10px; }
+  .brand h1{ font-family:var(--font-display); font-size:19px; font-weight:600; margin:0; color:var(--accent); }
+  .brand .sub{ font-size:10px; color:var(--ink-dim); margin-top:2px; letter-spacing:0.5px; text-transform:uppercase; }
+  select.vendedora-pill{
     background:var(--card); border:1px solid var(--card-border); border-radius:999px;
-    padding:6px 12px; font-size:12px; color:var(--ink-dim); display:flex; align-items:center; gap:6px;
+    padding:8px 12px; font-size:12px; color:var(--ink); font-weight:600; font-family:var(--font-body);
+    max-width:140px;
   }
   main{ padding:16px; max-width:520px; margin:0 auto; }
-  .card{
-    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
-    padding:16px; margin-bottom:14px; box-shadow: 0 2px 12px rgba(201,123,132,0.06);
-  }
-  .card h2{ font-family:var(--font-display); font-size:15px; margin:0 0 12px; color:var(--ink); font-weight:600;}
+  .card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:0 2px 12px rgba(0,0,0,0.2); }
+  .card h2{ font-family:var(--font-display); font-size:15px; margin:0 0 12px; font-weight:600; }
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .stat{
-    background:var(--bg-soft); border-radius:10px; padding:12px; border:1px solid var(--card-border);
-  }
+  .stat{ background:var(--bg-soft); border-radius:10px; padding:12px; border:1px solid var(--card-border); }
   .stat .label{ font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.5px; }
   .stat .value{ font-family:var(--font-display); font-size:22px; margin-top:4px; font-weight:600; }
-  .stat.full{ grid-column: 1/-1; }
-  label{ display:block; font-size:12px; color:var(--ink-dim); margin: 12px 0 6px; }
+  .stat.full{ grid-column:1/-1; }
+  label{ display:block; font-size:12px; color:var(--ink-dim); margin:12px 0 6px; }
   label:first-child{ margin-top:0; }
-  select, input[type=text], input[type=number]{
+  select, input[type=text], input[type=number], input[type=date], input[type=tel]{
     width:100%; background:var(--bg-soft); border:1px solid var(--card-border); color:var(--ink);
     padding:12px; border-radius:10px; font-size:15px; font-family:var(--font-body);
   }
   select:focus, input:focus{ outline:none; border-color:var(--accent); }
-  .pay-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;}
-  .pay-field{ background:var(--bg-soft); border:1px solid var(--card-border); border-radius:10px; padding:10px;}
-  .pay-field .tag{ font-size:11px; font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:5px;}
+  .pay-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
+  .pay-field{ background:var(--bg-soft); border:1px solid var(--card-border); border-radius:10px; padding:10px; }
+  .pay-field .tag{ font-size:11px; font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
   .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
   .pay-field input{ background:transparent; border:none; padding:0; font-size:17px; font-family:var(--font-display); }
-  .total-line{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-top:14px; padding-top:14px; border-top:1px dashed var(--card-border);
-  }
+  .pay-field select.mini{ margin-top:6px; padding:6px; font-size:11px; border-radius:6px; }
+  .total-line{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px dashed var(--card-border); }
   .total-line .label{ font-size:13px; color:var(--ink-dim); }
   .total-line .value{ font-family:var(--font-display); font-size:26px; color:var(--accent); font-weight:600; }
-  button.primary{
-    width:100%; background:var(--accent); color:#FFFFFF; border:none; border-radius:12px;
-    padding:14px; font-size:15px; font-weight:700; margin-top:14px; cursor:pointer;
-    font-family:var(--font-body); letter-spacing:0.2px; box-shadow: 0 4px 14px rgba(201,123,132,0.25);
-  }
-  button.primary:active{ transform: scale(0.98); }
-  button.secondary{
-    width:100%; background:transparent; color:var(--ink-dim); border:1px solid var(--card-border); border-radius:10px;
-    padding:12px; font-size:13px; margin-top:8px; cursor:pointer;
-  }
-  nav.bottom{
-    position:fixed; bottom:0; left:0; right:0; background:var(--bg-soft);
-    border-top:1px solid var(--card-border); display:flex; z-index:50;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  nav.bottom button{
-    flex:1; background:none; border:none; color:var(--ink-dim); padding:10px 2px 8px;
-    font-size:10px; font-family:var(--font-body); display:flex; flex-direction:column; align-items:center; gap:4px;
-    cursor:pointer;
-  }
-  nav.bottom button .ic{ font-size:18px; }
+  button.primary{ width:100%; background:var(--accent); color:#2A1605; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; margin-top:14px; cursor:pointer; font-family:var(--font-body); box-shadow:0 4px 14px rgba(232,185,76,0.25); }
+  button.primary:active{ transform:scale(0.98); }
+  button.secondary{ width:100%; background:transparent; color:var(--ink-dim); border:1px solid var(--card-border); border-radius:10px; padding:12px; font-size:13px; margin-top:8px; cursor:pointer; font-family:var(--font-body); }
+  button.whats{ width:100%; background:var(--whats); color:#fff; border:none; border-radius:10px; padding:10px; font-size:12px; font-weight:700; margin-top:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+  nav.bottom{ position:fixed; bottom:0; left:0; right:0; background:var(--bg-soft); border-top:1px solid var(--card-border); display:flex; z-index:50; padding-bottom:env(safe-area-inset-bottom); overflow-x:auto; }
+  nav.bottom button{ flex:1; min-width:60px; background:none; border:none; color:var(--ink-dim); padding:10px 2px 8px; font-size:9.5px; font-family:var(--font-body); display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; }
+  nav.bottom button .ic{ font-size:17px; }
   nav.bottom button.active{ color:var(--accent); }
   .view{ display:none; }
   .view.active{ display:block; animation:fadein .2s ease; }
   @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .list-row{
-    display:flex; justify-content:space-between; align-items:center; padding:10px 0;
-    border-bottom:1px solid var(--card-border); font-size:13px;
-  }
+  .list-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--card-border); font-size:13px; gap:8px; }
   .list-row:last-child{ border-bottom:none; }
   .list-row .l1{ font-weight:600; }
   .list-row .l2{ color:var(--ink-dim); font-size:11px; margin-top:2px; }
-  .badge{ font-size:11px; padding:3px 8px; border-radius:999px; font-weight:600; }
+  .badge{ font-size:11px; padding:3px 8px; border-radius:999px; font-weight:600; white-space:nowrap; }
   .badge.ok{ background:var(--accent-soft); color:var(--accent); }
-  .badge.low{ background:#F8E3DD; color:#B5564A; }
-  .bar-wrap{ background:var(--bg-soft); border-radius:6px; height:8px; margin-top:6px; overflow:hidden;}
-  .bar-fill{ height:100%; background:var(--accent); border-radius:6px; transition:width .4s ease;}
-  select#cat-select{ font-weight:600; }
-  .empty{ text-align:center; padding: 30px 10px; color:var(--ink-dim); font-size:13px; }
+  .badge.low{ background:#3A1A1A; color:#E08C7D; }
+  .badge.late{ background:#3A1414; color:#E0857D; }
+  .bar-wrap{ background:var(--bg-soft); border-radius:6px; height:8px; margin-top:6px; overflow:hidden; }
+  .bar-fill{ height:100%; background:var(--accent); border-radius:6px; transition:width .4s ease; }
+  .empty{ text-align:center; padding:30px 10px; color:var(--ink-dim); font-size:13px; }
   .empty .ic{ font-size:30px; display:block; margin-bottom:8px; }
-  .login-screen{
-    min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:24px;
-  }
-  .login-screen h1{ font-family:var(--font-display); font-size:26px; margin-bottom:4px;}
-  .login-screen p{ color:var(--ink-dim); font-size:13px; margin-bottom:24px; text-align:center;}
-  .login-screen select, .login-screen input{ max-width:280px; margin-bottom:10px;}
-  .login-screen button{ max-width:280px; }
-  .toast{
-    position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
-    background:var(--accent); color:#FFFFFF; padding:10px 18px; border-radius:999px;
-    font-size:13px; font-weight:700; z-index:100; opacity:0; pointer-events:none; transition: opacity .25s, bottom .25s;
-    box-shadow: 0 4px 14px rgba(201,123,132,0.3);
-  }
+  .toast{ position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:#2A1605; padding:10px 18px; border-radius:999px; font-size:13px; font-weight:700; z-index:100; opacity:0; pointer-events:none; transition:opacity .25s, bottom .25s; box-shadow:0 4px 14px rgba(232,185,76,0.3); }
   .toast.show{ opacity:1; bottom:110px; }
   .month-select{ margin-bottom:14px; }
   .row-flex{ display:flex; gap:8px; align-items:center; }
-  .icon-btn{
-    background:var(--bg-soft); border:1px solid var(--card-border); color:var(--ink-dim);
-    border-radius:8px; padding:8px 12px; font-size:18px; cursor:pointer;
-  }
-  table.simple{ width:100%; border-collapse:collapse; font-size:12px; }
-  table.simple th{ text-align:left; color:var(--ink-dim); font-weight:600; padding:6px 4px; border-bottom:1px solid var(--card-border); font-size:10px; text-transform:uppercase;}
-  table.simple td{ padding:7px 4px; border-bottom:1px solid var(--card-border); }
-  .pulse{ animation: pulse 1.4s infinite; }
-  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.4} }
+  .icon-btn{ background:var(--bg-soft); border:1px solid var(--card-border); color:var(--ink-dim); border-radius:8px; padding:8px 12px; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .del-btn{ background:none; border:none; color:#C1404B; font-size:16px; cursor:pointer; padding:4px 6px; flex-shrink:0; }
+  .parcela-card{ background:var(--bg-soft); border:1px solid var(--card-border); border-radius:10px; padding:12px; margin-bottom:10px; }
+  .toggle-row{ display:flex; gap:8px; margin-top:6px; }
+  .toggle-btn{ flex:1; padding:9px; border-radius:8px; border:1px solid var(--card-border); background:var(--bg-soft); color:var(--ink-dim); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-body); }
+  .toggle-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
 </style>
 </head>
 <body>
 
-<div id="login" class="login-screen">
-  <h1>🧾 Caixa da Loja</h1>
-  <p>Selecione quem está usando o app</p>
-  <select id="login-select"></select>
-  <button class="primary" style="max-width:280px" onclick="doLogin()">Entrar</button>
-  <p style="font-size:11px; color:var(--ink-dim); margin-top:14px; max-width:280px; text-align:center;">Não encontrou seu nome? Peça ao supervisor para te cadastrar em Config.</p>
-</div>
-
-<div id="app" style="display:none;">
 <header class="top">
   <div class="brand">
-    <div>
-      <h1 id="header-title">Caixa da Loja</h1>
-      <div class="sub" id="header-sub">—</div>
+    <div class="header-text">
+      <div class="logo-wrap"><img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/aAAwDAQACAAMAAAAh99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999995xBx199905x199999999999999999995BNFNBxBEpwHBBxhBx19999999999999BZRIhjDckFIDJB/wD4xQdfffffffffffaQU1aAVYcQgbIQ5QCAAZwfffffffffffaVXYRgX6Sr2sD+ZH22YhaVffffffffffaVaWwodSl1ilztTk3qSog1ffffffffffaVZYxCx7k9O37h0d2CjQA1fffffffffffQUa4/HuJQzVk5+Rg8yQgVfffffffffffSQuQTxlxQ2hQoczlwGHKXfffffffffffbJQPifwyxx5RsYlIByQRfffffffffffffcpwzET5R4x3Az6xKzhDfffffffffffffQ09dRvNaz3zWFqnN6MqfffffffffffffRRK36u979/4OnrfAwoA1ffffffffffffVTqEf636decO86fDMMd0ffffffffffffSQYzP636d6/6YKlP+E1QffffffffffffacwtgQVw44VY75ggSwMwffffffffffffbQS8ZHB/MOC70ASwBh4XfffffffffffffbQcQQ0wr1AQww8w0QRfffffffffffffffffbbTfTLzfbTTfbfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff/aAAwDAQACAAMAAAAQ+++++++++++++++++++++++++++++++/+++++++++++++++++++++++++++++++/+++++++++++++++++++++++++++++++/+++++++++++++++++++++++++++++++/+++++++++++++++++++++++++++++++/+++++++++++++++++++++++++++++++/+++++++6yCy2+++y4y2++++++++++++/++++++6Ed1tIyCOf9PNNyiCy2++++++/++++++C5Rpr7zl1X9urD995lI2+++++/+++++qVRUXiVk6HY5RH+tJRV/I+++++/+++++qd/tXjdoREY3s+mfULw3tW++++/+++++q9pzO69TVRufMLywmtCvVW++++/+++++qVtHlp+OZ8VdoUIe7OVX9W++++/++++++V3tBOcu8HsUbG9MVmN7VW++++/++++++KL6nuEUFL+lt3/AHHnFHaXvvvvv/vvvvvqpadD/wA0x4S4/O7eY4kS377777/7777771ObH7r3e+U//wBfu+8dfs+++++/+++++++r922E+3/f+U6c+29vzp+++++/+++++++F/p+++1v/APuvvL9k6+3Vvvvvv/vvvvvvlT/ePe//AHf7zn3v57zbVv7777/7777775yfo73ryz7z/wC6q+969Xo++++/+++++++q5X97FeM4q21v8wNeX1i++++/+++++++uQJ5v9d//AO7vsVPmf9eXvvvvv/vvvvvvvrkMTbX95czTXfffXcBvvvvvv/vvvvvvvvvvrrjvVDzvrjjvrvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv/EADURAAIBAgQDBQYGAgMAAAAAAAABAgMRBBIhMRNBURAiMDKxFCNAYYHBMzRCcZHwcNEFoeH/2gAIAQIBAT8A/wAnutZ6K6W/99RNNXXx0pOo8sdub+yErKyH7p3W3oJ31Xw7djioT7ZydR5Y7c39kJJKy2Lk6iQpcPVbegpp6ouXLl/gWVp2Q7KipcylPQuSqZ9E9ObFJJWRxBzHNKTzK5SdkcTharb0FVT2FM4gqiE7/AMr7E/yy+hSehKTnpHbmxy1UYkmk7bv+ERed2WjIVXs9ymuLJpvYp1bxuSaSUpPfkilOF8tmr/O5xHTbjIcu7xJvTkQqJvp9blKTvZi8dmI2J/ll9CnJz7q2HZLQw/6pmHXdKryNNdTF9yafUwTvKX0+5TnaI6KhHNVdr8kZI1JLI2n8/8AZjG1VT+RTyVaapSdnyHhalPbUw8lsIXjMxGxX/Kr6epSrRSsOsmYaSUnB8ym3T7r3R+LNRRianEqacjAeaX0+5TdrN7aGOuqifKxZzklHcxf4y/YqU3Tipbp/wDRCrKlrTenQqL3unQgLxmVveaLbmzPOnHKrWX96ntM+i/j/wBONJqzS/gm0PEN+ZJ+p7Q7Wjp+xxEkf8bO8p/T7lJpxFiGo8N2a+Zx3+nT9h1HVeaRGo4aLboxTyaxiijC/eetxC8abdR5Y7c39kNJKyMZNwi7HEl1FiHl1HOT5l31LvqUqcal1KdnyKM1g6Mu8nJ9NSFRwQ3J8xX6lOs0mmcST1uYOq27Mh7vVbEGmroXi1m9Fsnz/vXqJJaImY5d19knuuyGtybsJ5x6ak1fsg7q43ZkdjCecp7Ee5PLHb0/vQXitJqzPwtHt6fImYxXRHYqeddlLYluiHMmVOXZQd4FXcjsYXzkJvyx39ClFRVkLxmk1Zkr09HsYnYRJe8iN2Vyh5R7ohzJk90S2MP5StsR2MO3nsjDpQWhAXjMqK6syusis9h6SY1eSZU8rKew90LmTH5ip5WUL2ZW8pHYw/nKTIMXjzK0LqxUhkm12T2sQOaObGfr7avlZHYhUyTMPiovS5TdxeOypAxtO0r9kIZ5WGrNopq8kSVpMSu0iStJjhn0HS4ciSvFkduyn5kUFoLx2NFbDKpuPAQ6EMKqT+Q8JGb1RDBxhsiWDjPdEMFFapFTCRe6PZUnaK19B4SNrHsMeh7DHoLAx6FLBQg72IQsL4Cw0ZB001ZmXh6Pb0EjINWJXvljv6EaSirIyGQyGQSEvgrFiw0mrM/Cdnt6H7km75Y7+hGmoqyLFixYsW+HaTVmWnDux269P9/Ip01FWX+cP//EACwRAAIBAwMDAgYCAwAAAAAAAAABAgMRMRASIQQyQBNBFDA0YYHBIHAiUVL/2gAIAQMBAT8A/s+3n40z5Nv4JW1sZ8dEG3XavwPRKxYsWK1OU7bXpa5YsWLeFAh9QxiVhyUFuZF1Jq+ESnOnzPlCtJXR1FR00rDRvnObjDixU9WC33v+CnNVI7kSnJy9OBJVILde5FqauvBgQ+oY+NOrleSiMmrwaOileLR1uI/n9DR68py20l+Sc6kIvcuPsdF2MqqdGp6kSHVweeB/9eDAp/UsaLHVwdlNexGSmt6K0tlNs6Wntjd+512I/n9E03F2Oia2te5UaUG2dF2Mp1VOTj7oqUI1Mo6VvYx+AuB9PCT3Ns+Eh/ti6WKd7ssfDpdjsfCq958ljrsR/P6GT6dSe6PDPhk+93KdFU1ZE6MZu7yOi3xKTLKCsvAXGkEbxK5vN5vJ1pQtZXKifUzXFkhcm83iVy4+UPn560RTzpDGjErjVhcuwla+jVingZ7DHj5+RER5Idr0qZKZUyU8jw9KncUh5PYY3fwFyQJ5E/8AFiyVMlMqZKeR4Fkq5KWR5F2kx+AiHJMT4sQyVMlMqZKeSeCGUVSl3DyLtGPwEInhaU8lTJTKhDJUxrT7kPJDA4D8FF+NIE8kCZDJNkMk3dEMoedEPwlOx6hvubxzFM3imbjceoeoeoObH4dy5nS+n3G7ly5cv5GdPuN387h8jd/7w//EAEMQAAEDAgMEBggFAwIEBwAAAAEAAgMEEQUSIRAxUXETMjM0QWEGFCAiI1CBkUBCU3KxFVJiJJKCkNHxMEShssHh8P/aAAgBAQABPwL/AJqMUYDekl6vgOK6QVHuyWa78ruHkntLHFrtCPnkUYDekl6vgOKkeZX+9/2RHmmOErejkNnDquT2lji12hHzqKMBvSS9XwHFSPMjruR4DUIGxuF/KY4StySaEdVye0scWu0I+X2Vv/AijAb0kvV8BxUrzI65R8QN20ablbhdMcJm5JNHDquT2ljrO0Py0BZUWoj2oowG9JL1fAcVI90rrlHgL29gBZUW8AmuErckmjvyuT2ljiHaEfKwmBYJQU81FmliDnX4r0ipIad0fQsy3CcPZijAb0kvV8BxT3Oldf8A/BcvYCoohLURsOgc4BNoKURdH0LMvJYlCIKuRjdwKIvqAmuErckmjh1XJzCx1nCx+VBRr0f7gOa9J+tFyT0dsUYDekl6vgOKcXSvVllWVWVtkehTccqhDlsy/wDdZSuL3FztSVZWvroE20rckm8dVydGWusd6yqysrLKsqsrfIWqNYB3D6r0n60XJPR2RRgN6SXq+A4pxMr9UG3sqPDZ6ns2e7xKZ6PP/PK36KT0flA9yRjlVUctO60rCEWqyY25X9BqeMf3UrMjy0+CsoYXyvDWNJKhwKd+shYxHAS5tnTC/hoqjAqhguzLJyT4y02I1Vk1l1S4JUTNzOtGP8kfR427cX5KrweogF8udvFqc2yPyBqjWAdw+q9JutFyT0VHGA3pJer4DinOMj9f+yaFgmGCX4s49zwHFYtiPqjRFABn/wDapauaQ+/K4/VU1fUQu92R3LwVJPHiVMRI0f5NWLUBpZdNYzuKsoR7wQ3KsHx38yrarBG07KTPGRf85PgsQxSSV5bCcsf8rO698xusErnyO6KY3/tK9IKRrounaPeGjllXo7Sh73TPHV3LGq+SOQwwnLxK6eTNfO6/NYRikhlbDOcwdoCd69JaNsZbPGLZtDzTvkDVEsA7h9V6TdaLknpjAB0knV8BxUjzI65Q4Kih6adjOJso2tiiDW6NaFWymWd7z4lEppWAS5KwDwdosUgE9G8eI94Jw1UPWGyr7Z/MqyhMmrI7+9pYeKiwipeL5Q3mU/CalmoaHcisODoq6MOBBzWIKxFuailHknts7Vejbh6u9vje6xigkkkM0QzX3hPjINiLLVpuFLK94s5ziE75A1RLAO4fVek3Wi5LIAM8m7wHFSPL3XKPiBuTVgAviEf1/hVOlPL+0qXeimrC9KyH9wR3KYWeVF1hsq+2fzTG3Nlh1E2ljFx8Q7ysRxUsd0dPvG9yZitUHdpf6Kkmhr8rnNyzM1Vf3Ob9pRIf7rt/gVRVL6Oe45EKlr4KgDK+zv7SpYI5e0Y13NVOCxv1hdkPAqtpJKZ+WQf/AGnhH8e1RLAe4fVekIGeMu3WUxLzco+SsmrCZOirIneakbmjc3iFMLOKITQsHZmrYud1PJ0UL38BdPOqi6w2VPbP5rB2Zq+IHmq55jpZHN32T9+zC3ltZFbxNlXdzm/YU/U6JvvjK76FasNjoVT4hPD1ZDbgVQYoJyGSjK/jxWLQNno5L72jMFIE78e1RrAO4DmvSIXfHyTm8Lro10ay2TDYrCawVMABPxG71jdGYpzI0e4/+UQmhYDSlgMzx+1Y9V6dAw/u2RdYbKntn81h03Q1cbzuup2dLC5n9wVRE6KQtfvCssFpXSTCQ6Mb4+aru5zfsKdvWFNgnome4wke6dFWU7oZTHJ/wuRBabFUrXOmaG77qveI6OVx/tUp1Tvx4UDbNzybvAcVg9fTspbTSZX33WKdiNC7rSNPNpXruHcWf7F67h3Fn+xeu4dxZ/sVbWUDqWVrCzOW6e4vFQTPheHMNiFBi0U0eSqbb+EaLDpdWzBvlnTIMNp/eMjX8zf+FW4x7uWm0/yT3Zjc79kW8bKrtn81dYbivRtEc+rfAqb1GsF3vZfjexXq+GwnM6XP5Xv/AAjizBIxkTckIOpsqvEaV9NI1supaRuKcdVQVr6R92bvEIV9HWR2nsP3f9U6iw9//mB/vCjOHUGoeC/7lYtiZqjlb7sQ8OKeUfx8TAG9JL1fAcUXmR+qDkD7NlZW22WVBqjbrsqNZHc1ZD2D7Dj4oPDxledfAqS7XWO9E/j4owG9JL1fAcU55lfror6JqpIDO/K210MNk4tX9Nk4tVRCYZC129BqZh0hAN2r+nP4tX9Pk4tXqEnkvUJPJeoP8l6i/wAl6i+1/BR0js7RpvVQ7JC4+NkaJ54JzLOshh8nEL1B/kvUH+S9Qk8lUUj4m5nWssqbh0haDcL+nSeSmoJI2Fxy2CeEHCRuR+h/K5SNLHWdofx0UYDekl6vgOKkeZXXcvJBMWFHLUt24m3430TBqgLC2zx9grpmOZlkCYaeM3bclTSGU/47Mt5refs4gL05QGqi7NnLZWd2epNCiOCa4StySaH8rk9pY4hwsR+MijAb0kvV8BxUshkdco+IG7YExUJtMw+e3Exq0qEXkbz23+N/w+zZWVtkXeRz9mrF6dy8VH2beWys7u9SpyIvu8E1wlbkk0P5XJ7Sxxa4WI/Fy/6hmdnWaNW/9E06EEnaExQHVA3A2YiPcaqUfGbtBvVO8m7aiokZIQDoqad75QHHTbWSujIyleuS/wB3/oqL3qgbYt7/AN2yYfCfyXiouzby2Vfd3qVOXn4KNhkdYfdVEgdla3c3S/H8WxxY4OabEJ7RK0yR6OHWar781/JWtvQTVDvVObws5bK0Xh+qox8cbYjerk21nbuVD3hu3E97dmGj4v020xu6XnsOoIXio+zby2Vfd3qVOTWGR2mnFTSDL0cfV48fxrHFjg5uhCc0Stzx6EdZq/lWsbFNUSoTembsqheFyoR8U8ttKbzvO2t7dyoe8N24nvbswzrO20Z99214tIQo+zby2Vfd3qVZTI7+VK8AZI+rx4/j2OLHXboQnNErc8ejh1mpvBBRLDDeAjz2Si8TuSoes7Y42aVQdd3LbW9u5UHeG7cT3t2YaPdfsd1SqM/F+m2o7Z3NR9m3lsq+7vTml7lM8WyR9X+UfkDHFjrtNinNErc8eh/M1M4aKNYSdHjYdyouq7ZPpC7ksP67uW2t7dyoO8N24nvbsw8fA+uyXs3clSH4421Y+O5R9m3lsquwep3aWbuTkfkLHFpu3QotEjc7BY+LVGfBYSfiHltpxYO/dsrD8ArD+u7ltre3cqDvLduKb2oKiFqduyo7F3JU/bN21w+N9FH2beWyr7u9SpyKPyAKNxabjegA8Zmb/ELDHWnbtaLffZiB+GOaw7ru5ba3t3Kg7y3bim9qG9U+kDOWyoBMRATInh7TlO/bX9Zqj7NvLZV93epU5FH5AEFE4tNwqQgzNcOOo9nETqwLDeu7ltru3csP7y3bim9qbvUYtG3l7VcLhij7NvLZVd3epAnBOCPyEJip3WchqPYxE/GHkFhnXdy213buWH95btxTexR6uG26uOI213ZDmo+zby2VAvE4DenUsh/IU6il/scqimkjF3tICcEfkATVCdVAbwsPl7Fc69Q5YX13cttf3hyw7vTduK72Kl1nZz24k62RBypzeFmys7AqPs28vZxrsG81Ij8haoysPdmpGexVPvO/msHPvu5bcRP+qesLP+rb9duMHViw73qpg24s60jeSbdzlQm9M22yp7B/JR9m3l7ON9g3mnlH5CE0qKrlYLNe4DmvXZv1H/deuzfqO+6NXK5t2SP8xdZ7qOd8Z9xxbyXrs36j/ujWzfqv+6klL3EuNyo5XMddpIK9dm/Uf9167N+o/wC6lqHyddxdzKjlcx12kg+S9dm/Uf8AdeuzfqP+6dI+d3vEnzKdJplZu/lR1UjBZr3Ac167N+o77o1cpGr3W5oVkoFukd9167L+o77r12X9R33Xrs36jvujXTfqP+6nqZJRZ73OHmU4/I7q6zLMmyFrrjenASNzs3+LUHXsNAsyzK6usyzK6ur8UzNIf/ngpJABkj6vj5q6usyzLMsyzLMsyJ+TXV1dNeWuBboQnAStzxix/M1Xvv0V1dXV1dXXPcommR1h91JILZI+rx4q6urq6urq6urq/wArY8scHN0IT2iVuePR35mq9+sd3sjwJFwo2GR1h91LIMvRx9X+fm7HFjg5uhCe1src8ejvzNV777rdv2DjpyUTDK7TTieClkGXo4up/Pzljyxwc3QhPa2VmePRw6zV4G+9Wte+8eCjYZX6WHifJSyDL0cXU8fP52xxY4OabEJ7WysMkejh1mqKMyOsPqeClkGXo4upx4/PWOLHBzdCFLPmbla0MG828f8Amp//xAArEAACAQMCBAYDAQEBAAAAAAAAAREQITFBUWFxobEgQIGRwfHR4fBQkDD/2gAIAQEAAT8h/wCqPyfr/g+Eg4nAXT/uD5O9/wACO2S0S0QQlaTkT9UHs+AmH/aGh3zX/BP6FhJYS2GhNykzA5VhohQol6hPesp04PgJh/zhFSB+L5Pf9T2cpYSGiXfWbS0F6V5xcRXrIezGxUH+cIQUGPwfJi/qMCrK0LCQ0S2TNIEqKeME2ayuKz0izNODExAggggjwvzyF4CmzBUyIBlZMNukx1wYXmuOTrCwsIOLXq1yCCBBh9wBLS0i93vkfHMZF5CSW4rvVgzsx0iBBBBBBBBBAx+cXgrc678Czzgog6aOHNM6e1lokRaULmIOiwkM1NZQkTIxO78DuG1LbGHejwJHRZFr4GOS4Sh+CmGWGhjH5pCFRmY+f4OqGdDMKPUFPcFolhItEF2b6JECz5GxxbjROUS7u+jrIhFj5H4G5A0UPBPCQnuXRuX/AHqTEky+5KxGzXHtpJoxljQkKCWfV7GEFfFTnP7Jwoxj80hCozMfP8HXDOj5sErTdLRbISwoXMSYnOUJBHayD++Z2CA425z7BlE8bHFGVbn4jPwEDIMPzuv0HEVbWfMT65ySGvEszyFuMxcRb9h3EtBWq9/7uOSQVrI0+rJE5+aMfyK0I0K/nGhjGPzCEIVGSMHP8HVK9o4CrCSwkchqcjEOVBI1gXI1EZ+hcoMn4W3/AL0GPVv1URhAQp2RejWAkqYSexCsmGCI0FOuIY5JDGtG/roYSRDlaDs0y3LCw0c6NOhjGPzCEIVGSMHP8HVBCU4sLZYRZJlqVoPi6h5S07RmMjMb+FkuEDW9AhPejVopkfiGrk8EPcMjTL+xJpps0HChtW/2D+VsXBgcMuL1REQ7gsVRyQT7HMEWQdnpUGMfmUIVGSMXP8GlA1txl0MJaCRKZw6EEsLKx8JscapD0HlFwvDlFp0LimOuJnoEddEYgm/YmxokJa9hwiaMQ+hn8TYTAfEdJstHtQIpOcwhNdlkmBCS+byIm6GMfmUIVGZ1X4GQNw8G2w22J6KBaaMcXEuYKU9tlG6RipUI+4lZzMeiG70iOsiLAS58MC57IkxQ0OhmQuxtzxbD+ptQYzWsOZLbd+ch5stEi80gerqS5uyJGoYx+ZQhUpxRMLkh3FiD9RXwfd/wfd/wff8A8EmMFFlf2ocHwmiPeShuJb0HV+6E+RrLV/NCVlNMSz6DmNlhCUuoigyIDTZOUQOxrMP0whIL2cBrYQOaworxyoJLS2fDIPN20cgtUKj0RK98pKDLYt3HUsY/MoQjHgOTMlssJFpHHo5HWihfcae/gGwEXXdhhC+5D3GjmGJCkZqjgIcT+aYry4SkxjH5lCPze8VG60JaJCwW50T2SE3EvzD/AGQ2JQ2JmWiDU5Ptj7AW97zje84/vItfeQq8ScJm4BEQnwOZrfvJAfsJxfecX3j3veTsuRYVwpELU5ON7xoWQa0+gjNSfoYyKgGMfm/m53JaQsJLCQ3CxaTzFSZ7yq2r3mW5EbKN2rdOqoVufIlFocsSrQmEJHq3hcgNUHRadCWLRMpk3rbAisSfodOIGPzXyd7/AIMG1olhIaJcz2FU4eLXmZQRrdK4F/L1Q/CEnheH7NEh0+nRGdGQtkuJ70n6HTpBj8xB+BDW/AIhBbLcwKpEpMt6SN2ZJz6xCpCfR7Il+twrZ2ngP6Qk2+Lq8p2omVxkDo1OmMzMiIaHLEmEKy2wkO7lcHyH5vpBHGQjuuApZDgNmhI8CSPhVPSJE/BmvoGvWncdq9CzUkd7Sr7i0XiiGelU6YzN1s4I1BFdnhIQwVzqcY/NvhA/rykacVwE1DkNnZFSxy7KpAi4bVcbk31r1J33avQs1Eu7KsnFU14RM6VTpjdIn8QtW0RjPr1FjH5tC48DetXCO6IRZfcSG1RwwpiPEJc2VJBsvAnUnd9nXp2akTt2qWM4ET8akg3SqdIRBW3ewpianvoYx+bQhciAyKSbo04og+ZkzPZDokshIbu6PJ5PAnUnd9nXp2LJEz3paH8ZBxZrF6R0iiTyiD1R71mMfm0IQvugGZJOLuibQiFe9Xq9SLjNeDOvO97OvQsyOcJo0GeObFYE4jpVOgMvBmMfmkIVEj4QY1R/No9xKsB8WdIF7y8Aded72dehdJYHNRDstlvgkdUv7qDpFOgMvBmMfm0KrMWGhQsOPhOUJfgDqzu+zr0LoQDZPFMNmzoFOk8HijGPzaEKhhyGhoH4J0cDwB153vZ16RiQqtFlwffVS8OkUYsSx+CRn8QlMresYx+aQhUPQcvvg6THqX98fq9nXpGJE4ayE50Zlwok8GDpXjJmMfm1RCGI2SXaV1fgmnGSV8fMJf5YdYuSz1A3VSWt/UfZbvYRpClUTqDp/haKqMY/NIVENR4T+UBfuov3Mi0NaseJxLeRybjig+6n7ZGZmashXWqcC/fR/upB27Fw4qyaBfupue/EedSu2YQteqscL4KB9jHxNtZpuIiQrjPtZ9rPuZ+zRMSHEoMYx+fQRVBGfCDmmF+5Fwcyhh+DHTsxaTVhYeiV2whjNrf+Hiw6BsYx/wCBImKodkB9iODuhWE0F4wFZSrkYYJZbCQtjrnd8A5PAGGGJGP/ABJJJJGQgZ1wYO6LEMhLD5UkktyziTFBZbYSE8FcvVySSSSSSSSasf8AlNpA1rgw90WL2hWGm0JFEhTkp1DaoIrswgtgJl6v/supA1L0D3XATVg3ocmsJMyGuwyaIJXyTLV/9zpBaCwHuiwBJXZhBfATOp/919IGTo2dT/qn/8QAKxABAAIBAwIGAgIDAQEAAAAAAQARITFBURBhcYGRobHwQMEg0VDh8TCQ/9oACAEBAAE/EP8A6JhnP+eKEgcDQtjjkw3XsRRbfsbRUKqR/wAfUqVKlf8AiUJC4GuEccmD1WjY2wGwQGhYEPmA6BTtOP3NorFVIypX+LqVKlSpUqV/GoUJGxNcI45MrIDDdkDglQIsCl/uJ9fsZffyKVpCflTvJ+5tFYqpGVKlSpXSutf4KoEOgwwJUqVKlQ0KBwNLwccmYZgFHrZAbEEIKDkpa/7KlRXAqSxrDHHgJx0+kA6FOwfo77RTqqRlSpUqVKlSpUqV/gAgS9jppG2yqCCVKlQWbRwNLwccmXRhAHCA4JSokUcW/wDZXVXbQdxBW0DLWd287vhCcjZY/Q77RSqqR6PDPDPD0VKlSoJUqV+aBBmWJiZvREMFUYYJLRmiPdZSsOYJUqUnUYmuEduWXWDEdB2DYIaCkgs6v9TwzwzwzJpLEhPAUL94gXkIr783e5b+9VyG194DqOsy7fMBSFlg/R32iHF0jPDPDPDPDPDPDPDGGBB+aCBBklhhon7kfYOszMyQSoDNsxNLx2OWY/iUGgRodqJkuIZXqzsTsRZtKdp2osaJYjpFSDQh8euXlHfmQtV1WZtItYAhT4C3C2EsOn6PiLLRSMVxHNp4YW2guJ2JXtK9pVBB+cIyQ4z6fiBf0cw5wZggYEdJpeDtyxsWQuUdg4JQAiao6yjzilq/N18pQW+5S+tQ550Cv6l6W0WfATD5SjaGekYo1g2+kOQtOncua9I79aHa+UMksrh+RiAJdq3YcO6MzAu0elr0LjXkpwIzLpDSlYIiLFIzw58moPywuvmFrJajXxPlVRnEpJRcMH5w6iac+j4j6XmHODMIA0wTS8djlhdtAtNgBsEqnhXDV0hJqmBVjd7Hv80YCtBwaNL7bSxNN5EeBoSvfuWp4rEKxS9mzompea3K85uJCvddzEaaZtu80Jl6/wCzCpfMbNG5AYynb5Vcf3VHqC/UqHqGTZ3uM2tp2qyp3xb5QAKQCrMC7jTz7SrRD1PDLL5vyP22ik4r9WS6HbCaSqBveq9bjshdaGgvJxnOkfz/AA3IQ7mXh3g1hg/OD1E9xPv+I+35hyweKDTwrjw5YPQIB62QHENFa9iuXz1qaQrHi0LhqBC4BRHCVyG2VHkUdLmIs6MOWrPcS8YlN6lrzLPOWp3nq02S36GWHDvCGD87hd0hrkICCcIfTUlOxliX0cvlBDgIFb/aUBU63IifEZ4bkhGSkjekohXlO6gFg30O8ZwVIKSNwqLEaRhcwbB0uHWH88DqJ7ifT8R9jzEQNVpwrjscswLAoOg2A2ItaobSrrT5gySjXTzBIuqknr6tOMdxufqSEQSxwkN5YMvzh9bos+rljMkqA3Zb142cteA+fjHpBjI2Gnm/7gh71WvtOcoAIOzv2bX5osPpaDVCwm3Z7fEB+kDigwF5XJwbPlLODQRU8HU8oBsMT39T3iR71DIdmUXBr+fDqJ7ifd8RY+6M6q4KFAoGBsHBKtOixxc/WUJHhpLOzI+iyjO69yoR6OiPS4M1bbfgP6TQpqOULCXe9We+miH6u7D1vzqJ7hEKLAbnA+8ZSu8eYjKlO6Unos+x5y80Re7zis0qQ07Pb4isuRklUN8O8HTyi0Ntc3GdGUNtUciLQ8QTzlTg1/PhWSLGBLDL8cE4WtPxiFABM3vOS9JyXpHOV6SiR0lh8ork6Hxvv4xBCwhdmq4zadmtpnj1qJ4VWZrf4B5zP20RaGvwL5S7VDubzROf/wBWNLgqtFa9llPgcKKYY9VoHMOeC2nVijIPZfLmfU84887zJBMrRutXaU+cA9qrTF+FftNwJl1JC/RlTe4PwC+3Cj1SEnvFl/PxWZkgON5du3LBCBU1KFVQm0YTJphPX+Hn3vsygyWGKdMXKn2ijWuB8OIXf71HvNxsgB6ZwNnCA5+Bnzl16LHQOzbx+IvlFq5Vl11m8bw1g3f+rMiO80PNOx4Tc9zvtb/BVMXGafUlyIGwpe2H7gGrtZN9A0NdLX2XcNK4qGsWpv2gceHonv34YO4q9XIaeOJTI6aZHGS68YdvFVv9isHtMp4Gcr6Y2lq5iv8APBE2WVpL4ODlnGp4BmxwTGACapvESBXedyN5jbvBLrH5jlZgA1RGsLd5Z3i3rGPHmhgpXCPdmbWNzA5opCcy8FvX2jcwCsxV03dEBoeF2/R8RBzKRJZvH+cCgKBrQeI4OWG1mtJsg4JiVwboZZnvMyIZaMQbPrv6iz9r+o4ABnIyD+5QlwGkICrz5QH+1/Uq3vN/U/2tP+0n/STceolETcC5YVijEPLFa0EeNg90jamTmFXcjUriwE5/3kd/cgtFai8/SWEuVTKGWjGv96NNDYHvxKshatghoxpDT9HfaMcXSP5woGlq0BbHByykwKGrhBsS3DcAavPWukZ1mQNXqCSpUr4d7k/UtGdhoSpRyx6V/cqVBjzgaxXnGiy0NFHuVkisgNjHheIVNrduV5el6F+8qVKlTxVv1+5h5h+zsSobDt+SWcUjZjwlcorQaHMPedLofo77RiiqR/MAxJlscI45MS0Bg9bIDYg7xg4X07pq1mbtR79bec+h/wBztuPfq24KfUf1KlQY84IxXiEBDK6W+jKlQp06UHsvRJjw/V2Og9P8kOGef1Ljh1lRaEyb7X6whJ0+h+jvtGQKpH8sAskAHoWx7jaAZMsC7GlynWVvmb5umpjLHIyidCPTuLHr/wAlL4L6Z69gA97/AH10OIF36maabKGy8dpUqEtUK4PzDuD9+0ed209HrwgnwdO53w9H6bjp7H8kOHn+poRoPhHUa95hgIqVulZcg4H5724Nj8suBViQUYOO+6zaEdBhDp49qidCoaSpuiyx19d4jGtjyK6Znj+R+5c+C9nrdeKelHVV4T4jv79fVV9zJFnuZe6v31pX1V6d4IhrzT67jp7H8k0PP9QVTuGpvK62WC3SvEHWqtiuU9uD80RiqxIS0Xuz9DaOqrhTekE6mpIsszPl+59MMvTk4B9El/Ifk6/ZoHX2T4n3+/r95ydPhlPV/wBdal9D/vr36T3n13HT2P5INaLHR3lKTzUod3sQ7eLbFJy9uD8+EOqsSEtDZj9HbaWOiyUmql2Io1hsiyzvhe4dO9XxTwWHr/zp3rH2iv79Tr7Z8fw2+05IE8ih9L/vouwJ9pUeU9zrXzdPrn9z67jp7P8AJMbAFtgGMsBXC25TyPbgmybfzwY4uxILsdi/Q7bRBiF1fukVOX+Fvfp3qKnZAPT/AL08Unqx+5l9Op19s+P4bfacnT71HwdO33wSo8B7PXxtb2J9tx0rFhYy+JC0K3cfeDJDpDp+eG+M9XYkAUN7T9HbaYiTG7qd5X561r6mOlV2J73+o/t5OvtXx/Ab6zkmc2Pkvd6XnwSzfZx1svG+6T6bjp7f8kOHn+oMkGkOnSPzh3QKpliQMY5Hb9HbaOJcPuD1qv8AsXo2z+0P9x39up19q+I+pvrOSCLw3Hqz0dZSoPEjxJQ+D1r5r6H/AHPtuOnt/wAkEDJBpDpD+eO6LWEGaZIcwqHbOp/Hwk9RP6jv7dTr9jtF1N9ZyTMztevb+VabC/T+p9tx0z8D8kRYtkUqUVDp+eD1j1mRiPUjZ7wwtEv+CM7Huv8Acd/fqdX6T4jvrb6nklQaqECgDQ6aT25an/IQRLGx6XA2Pwz7bjouoFAb5j2JNOkbtFCNWUJD+eBx6yhcSod/9zvZb41/B1OyegCXfdqdaB7PiXB1yr7uSYz1H36+G7+I63flO1lfTHS3c17n9z67j+Iv6dIM/nkHpesoXomechvL+Fvva+8rv1k61Ds+JUeq+vdSLEa+gF/XVhuFRzaP1KwANdAHMvkqWO+XpZ2l6M/qZ/dwfxL6+kuYs/ngGPpV7Sh45vj0JvowkfXhRyWDF3P62jMDIXcx0EKV7HlCudTxGeL2VtfOG9MVoa7k33TvzqSwtU9YaOdEI8yb2NiamLNyLWUg0uVlXU52Xy9u0Gh7dsehCWCtSwBOISKdAUB0cZ4wzYRlKxYMB85ax/ngYMGdqdqJxL8RhWaIwMZLLb9HxLCgHUc80S3ETidieCeCW4nZnhggKEVz9YJLuDgbvBKYoOXCuXtwTwQ7YLiW4luJfiK4icRuJfLov8ADBhHYnYngngjNFWJBVBvRH6O20OmDaangngngngngnghAeBqmrYLoFbK3SsrwqtsPM9uCeCeCeDpeCeCeCdididiMKL/A3LgzwdHgngiMVWJBEhvTH6O20KlwCpfevWWNUXnMvo8EowMBx3XuTG0y0rdKzKV1vjlPbgng6PB0eCeCeCZbTwS5faKL/CXLly5cuKhVYkB6G9Ifq7bTMuKM9O3hL2HQ0y5X1KltXlrUEPJDXKXiZdst8cp7cEuXLly5cuX2ly5cuX0v/CXLl9L6JhVYkAeC9t9lm0TZOuB48xyiQZrYUkdpxvl4Jmy1rgW724JfS5cuXLly5cuXL/xy4FWJAQle0/VybTH1LGtwrMgWWxXKe3B/43L/AMmuFViQg07bz3twbf8A1T///gADAP/Z" alt="Lojas Vital"></div>
+      <div>
+        <h1>Lojas Vital</h1>
+        <div class="sub" id="header-sub">—</div>
+      </div>
     </div>
-    <button class="user-pill" onclick="logout()" style="cursor:pointer; border:1px solid var(--card-border); background:var(--card);">👤 <span id="current-user-label"></span> · trocar</button>
+    <select class="vendedora-pill" id="vendedora-ativa" onchange="setActiveVendedora()"></select>
   </div>
 </header>
 
 <main>
 
-  <!-- VENDA -->
+  <!-- LANÇAR VENDA -->
   <div class="view" id="view-venda">
     <div class="card">
       <h2>Nova venda</h2>
       <label>Categoria</label>
-      <select id="venda-categoria">
-        <option>Sapatos</option>
-        <option>Semijoias</option>
-        <option>Roupa Masculina</option>
-        <option>Roupa Feminina</option>
-        <option>Outros</option>
-      </select>
+      <input type="text" id="venda-categoria" placeholder="Ex: Sapatos, Semijoias, Roupa Masculina...">
       <label>Produto</label>
       <input type="text" id="venda-produto" placeholder="Ex: Tênis branco 38">
 
@@ -195,7 +136,14 @@
         </div>
         <div class="pay-field">
           <div class="tag" style="color:var(--credito)"><span class="dot" style="background:var(--credito)"></span>Crédito</div>
-          <input type="number" inputmode="decimal" id="pay-credito" placeholder="0,00" oninput="updateTotal()">
+          <input type="number" inputmode="decimal" id="pay-credito" placeholder="0,00" oninput="onCreditoChange()">
+          <select class="mini" id="credito-parcelas" style="display:none;">
+            <option value="1">À vista</option>
+            <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
+            <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
+            <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
+            <option value="11">11x</option><option value="12">12x</option>
+          </select>
         </div>
         <div class="pay-field">
           <div class="tag" style="color:var(--debito)"><span class="dot" style="background:var(--debito)"></span>Débito</div>
@@ -205,10 +153,6 @@
           <div class="tag" style="color:var(--dinheiro)"><span class="dot" style="background:var(--dinheiro)"></span>Dinheiro</div>
           <input type="number" inputmode="decimal" id="pay-dinheiro" placeholder="0,00" oninput="updateTotal()">
         </div>
-        <div class="pay-field" style="grid-column:1/-1;">
-          <div class="tag" style="color:var(--crediario)"><span class="dot" style="background:var(--crediario)"></span>Crediário</div>
-          <input type="number" inputmode="decimal" id="pay-crediario" placeholder="0,00" oninput="updateTotal()">
-        </div>
       </div>
 
       <div class="total-line">
@@ -216,11 +160,55 @@
         <div class="value" id="venda-total">R$ 0,00</div>
       </div>
       <button class="primary" onclick="salvarVenda()">✓ Registrar venda</button>
+      <button class="secondary" onclick="switchView('crediario')">🤝 Essa venda é crediário? Toque aqui</button>
     </div>
 
     <div class="card">
       <h2>Últimas vendas de hoje</h2>
       <div id="vendas-hoje-list"></div>
+    </div>
+  </div>
+
+  <!-- CREDIÁRIO -->
+  <div class="view" id="view-crediario">
+    <div class="card">
+      <h2>🤝 Nova venda crediário</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Os dados do cliente facilitam a cobrança depois.</p>
+
+      <label>Categoria</label>
+      <input type="text" id="cred-categoria" placeholder="Ex: Sapatos, Semijoias, Roupa Masculina...">
+      <label>Produto</label>
+      <input type="text" id="cred-produto" placeholder="Ex: Tênis branco 38">
+      <label>Valor total da venda</label>
+      <input type="number" inputmode="decimal" id="cred-valor" placeholder="0,00" oninput="renderParcelasPreview()">
+
+      <label>Parcelamento</label>
+      <div class="toggle-row" id="cred-parcelas-toggle">
+        <button type="button" class="toggle-btn active" data-n="1" onclick="setCredParcelas(1)">1x à vista</button>
+        <button type="button" class="toggle-btn" data-n="2" onclick="setCredParcelas(2)">2x (30/60)</button>
+        <button type="button" class="toggle-btn" data-n="3" onclick="setCredParcelas(3)">3x (30/60/90)</button>
+      </div>
+      <div id="cred-parcelas-preview" style="margin-top:10px;"></div>
+
+      <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border); color:var(--crediario); font-weight:600;">👤 Dados do cliente</label>
+      <label>Nome completo</label>
+      <input type="text" id="cred-nome" placeholder="Nome do cliente">
+      <label>Telefone / WhatsApp</label>
+      <input type="tel" id="cred-telefone" placeholder="(00) 00000-0000">
+      <label>Endereço</label>
+      <input type="text" id="cred-endereco" placeholder="Rua, número, bairro">
+
+      <button class="primary" onclick="salvarCrediario()">✓ Registrar venda crediário</button>
+      <button class="secondary" onclick="switchView('venda')">← Voltar para venda normal</button>
+    </div>
+
+    <div class="card">
+      <h2>📋 Parcelas em aberto</h2>
+      <div class="grid2" style="margin-bottom:14px;">
+        <div class="stat"><div class="label">Vendido em crediário</div><div class="value" id="cred-total-vendido">R$ 0</div></div>
+        <div class="stat"><div class="label">Em aberto</div><div class="value" id="cred-total-aberto">R$ 0</div></div>
+      </div>
+      <div id="cred-parcelas-list"></div>
     </div>
   </div>
 
@@ -235,8 +223,7 @@
           <div class="label">Meta do mês — <span id="p-pct">0%</span></div>
           <div class="bar-wrap"><div class="bar-fill" id="p-bar" style="width:0%"></div></div>
           <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:var(--ink-dim)">
-            <span id="p-meta-txt">Meta: R$ 0</span>
-            <span id="p-falta-txt">Falta: R$ 0</span>
+            <span id="p-meta-txt">Meta: R$ 0</span><span id="p-falta-txt">Falta: R$ 0</span>
           </div>
         </div>
       </div>
@@ -248,7 +235,6 @@
         <div class="stat"><div class="label">Comissão</div><div class="value" id="p-comissao-valor" style="color:var(--accent)">R$ 0</div></div>
         <div class="stat full"><div class="label">Ticket médio do mês</div><div class="value" id="p-ticket-medio">R$ 0</div></div>
       </div>
-      <p style="font-size:11px; color:var(--ink-dim); margin:10px 0 0;">Atinja a meta para subir o % de comissão sobre o total vendido no mês.</p>
     </div>
     <div class="card">
       <h2>Minhas vendas de hoje</h2>
@@ -260,12 +246,12 @@
   <div class="view" id="view-fechamento">
     <div class="card">
       <h2>Fechamento de caixa — hoje</h2>
-      <table class="simple">
-        <tr><th>Forma</th><th>Sistema</th><th>Na gaveta</th><th>Dif.</th></tr>
-        <tr><td>💵 Dinheiro</td><td id="fc-sis-dinheiro">R$ 0</td><td><input type="number" id="fc-real-dinheiro" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-dinheiro">—</td></tr>
-        <tr><td>📱 PIX</td><td id="fc-sis-pix">R$ 0</td><td><input type="number" id="fc-real-pix" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-pix">—</td></tr>
-        <tr><td>💳 Crédito</td><td id="fc-sis-credito">R$ 0</td><td><input type="number" id="fc-real-credito" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-credito">—</td></tr>
-        <tr><td>💳 Débito</td><td id="fc-sis-debito">R$ 0</td><td><input type="number" id="fc-real-debito" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-debito">—</td></tr>
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <tr><th style="text-align:left; color:var(--ink-dim); font-size:10px; padding:6px 4px; border-bottom:1px solid var(--card-border);">Forma</th><th style="text-align:left; color:var(--ink-dim); font-size:10px; padding:6px 4px; border-bottom:1px solid var(--card-border);">Sistema</th><th style="text-align:left; color:var(--ink-dim); font-size:10px; padding:6px 4px; border-bottom:1px solid var(--card-border);">Gaveta</th><th style="text-align:left; color:var(--ink-dim); font-size:10px; padding:6px 4px; border-bottom:1px solid var(--card-border);">Dif.</th></tr>
+        <tr><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);">💵 Dinheiro</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-sis-dinheiro">R$ 0</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);"><input type="number" id="fc-real-dinheiro" oninput="calcFechamento()" placeholder="0,00" style="width:85px; padding:6px; font-size:12px;"></td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-dif-dinheiro">—</td></tr>
+        <tr><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);">📱 PIX</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-sis-pix">R$ 0</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);"><input type="number" id="fc-real-pix" oninput="calcFechamento()" placeholder="0,00" style="width:85px; padding:6px; font-size:12px;"></td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-dif-pix">—</td></tr>
+        <tr><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);">💳 Crédito</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-sis-credito">R$ 0</td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);"><input type="number" id="fc-real-credito" oninput="calcFechamento()" placeholder="0,00" style="width:85px; padding:6px; font-size:12px;"></td><td style="padding:7px 4px; border-bottom:1px solid var(--card-border);" id="fc-dif-credito">—</td></tr>
+        <tr><td style="padding:7px 4px;">💳 Débito</td><td style="padding:7px 4px;" id="fc-sis-debito">R$ 0</td><td style="padding:7px 4px;"><input type="number" id="fc-real-debito" oninput="calcFechamento()" placeholder="0,00" style="width:85px; padding:6px; font-size:12px;"></td><td style="padding:7px 4px;" id="fc-dif-debito">—</td></tr>
       </table>
       <div class="total-line">
         <div class="label">Diferença total</div>
@@ -294,49 +280,10 @@
         <div class="stat"><div class="label">Crediário em aberto</div><div class="value" id="d-aberto">R$ 0</div></div>
       </div>
     </div>
-    <div class="card">
-      <h2>Por forma de pagamento</h2>
-      <div id="d-formas"></div>
-    </div>
-    <div class="card">
-      <h2>Por categoria</h2>
-      <div id="d-categorias"></div>
-    </div>
-    <div class="card">
-      <h2>Ranking de vendedoras</h2>
-      <div id="d-ranking"></div>
-    </div>
-    <div class="card">
-      <h2>Fechamentos de caixa do mês</h2>
-      <div id="d-fechamentos"></div>
-    </div>
-  </div>
-
-  <!-- CREDIARIO -->
-  <div class="view" id="view-crediario">
-    <div class="card">
-      <h2>Registrar recebimento</h2>
-      <label>Cliente</label>
-      <input type="text" id="cred-cliente" placeholder="Nome do cliente">
-      <label>Vendedora responsável</label>
-      <select id="cred-vendedora"></select>
-      <label>Valor recebido</label>
-      <input type="number" id="cred-valor" placeholder="0,00">
-      <label>Forma</label>
-      <select id="cred-forma">
-        <option>PIX</option><option>Crédito</option><option>Débito</option><option>Dinheiro</option>
-      </select>
-      <button class="primary" onclick="salvarRecebimento()">✓ Registrar recebimento</button>
-    </div>
-    <div class="card">
-      <h2>Em aberto (todo histórico)</h2>
-      <div class="grid2" style="margin-bottom:14px;">
-        <div class="stat"><div class="label">Vendido no crediário</div><div class="value" id="cred-total-vendido">R$ 0</div></div>
-        <div class="stat"><div class="label">Em aberto</div><div class="value" id="cred-total-aberto">R$ 0</div></div>
-      </div>
-      <h2>Últimos recebimentos</h2>
-      <div id="cred-list"></div>
-    </div>
+    <div class="card"><h2>Por forma de pagamento</h2><div id="d-formas"></div></div>
+    <div class="card"><h2>Por categoria</h2><div id="d-categorias"></div></div>
+    <div class="card"><h2>Ranking de vendedoras</h2><div id="d-ranking"></div></div>
+    <div class="card"><h2>Fechamentos de caixa do mês</h2><div id="d-fechamentos"></div></div>
   </div>
 
   <!-- CONFIG -->
@@ -360,18 +307,21 @@
     </div>
     <div class="card">
       <h2>Backup</h2>
-      <p style="font-size:12px; color:var(--ink-dim); margin-top:0;">Os dados ficam salvos na nuvem deste app, mas faça backup local de vez em quando por segurança.</p>
+      <p style="font-size:12px; color:var(--ink-dim); margin-top:0;">Os dados ficam salvos na nuvem (Firebase), mas faça backup local de vez em quando.</p>
       <button class="secondary" onclick="exportBackup()">⬇ Exportar backup (.json)</button>
-    </div>
-    <div class="card">
-      <button class="secondary" onclick="logout()">Sair / Trocar usuário</button>
     </div>
   </div>
 
 </main>
 
-<nav class="bottom" id="bottom-nav"></nav>
-</div>
+<nav class="bottom" id="bottom-nav">
+  <button id="nav-venda" onclick="switchView('venda')"><span class="ic">🧾</span><span>Lançar</span></button>
+  <button id="nav-crediario" onclick="switchView('crediario')"><span class="ic">🤝</span><span>Crediário</span></button>
+  <button id="nav-painel" onclick="switchView('painel')"><span class="ic">📈</span><span>Painel</span></button>
+  <button id="nav-fechamento" onclick="switchView('fechamento')"><span class="ic">🧮</span><span>Fechamento</span></button>
+  <button id="nav-dashboard" onclick="switchView('dashboard')"><span class="ic">📊</span><span>Dashboard</span></button>
+  <button id="nav-config" onclick="switchView('config')"><span class="ic">⚙️</span><span>Config</span></button>
+</nav>
 
 <div class="toast" id="toast"></div>
 
@@ -388,147 +338,102 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const dbRef = firebase.database().ref('loja-db');
-
 let dbLoadedOnce = false;
 
 /* ====================== ESTADO ====================== */
-let DB = { vendedoras: [], vendas: [], recebimentos: [], fechamentos: [], comissao: { baixo: 1, alto: 2 } };
-let currentUser = null; // {nome, isSupervisor}
-let currentMonth = new Date().toISOString().slice(0,7); // YYYY-MM
-
-const SUPERVISOR_NAME = "Supervisor(a)";
+let DB = { vendedoras: [], vendas: [], creditos: [], fechamentos: [], comissao: { baixo: 1, alto: 2 } };
+let activeVendedora = localStorage.getItem('loja-vendedora-ativa') || null;
+let currentMonth = new Date().toISOString().slice(0,7);
+let credParcelasSelecionadas = 1;
 
 function ensureDBShape(){
   if(!DB.vendedoras) DB.vendedoras = [];
   if(!DB.vendas) DB.vendas = [];
-  if(!DB.recebimentos) DB.recebimentos = [];
+  if(!DB.creditos) DB.creditos = [];
   if(!DB.fechamentos) DB.fechamentos = [];
   if(!DB.comissao) DB.comissao = { baixo: 1, alto: 2 };
 }
-
 function loadDB(){
-  // Resolve na primeira leitura; depois fica escutando mudanças em tempo real.
   return new Promise((resolve)=>{
     dbRef.on('value', (snap)=>{
       const val = snap.val();
       if(val) DB = val;
       ensureDBShape();
       if(!dbLoadedOnce){ dbLoadedOnce = true; resolve(); }
-      else { onRemoteUpdate(); }
-    }, (err)=>{
-      console.error(err);
-      ensureDBShape();
-      if(!dbLoadedOnce){ dbLoadedOnce = true; resolve(); }
-    });
+      else onRemoteUpdate();
+    }, ()=>{ ensureDBShape(); if(!dbLoadedOnce){ dbLoadedOnce = true; resolve(); } });
   });
 }
 async function saveDB(){
-  try{
-    await dbRef.set(DB);
-  }catch(e){ showToast('Erro ao salvar — verifique sua internet'); }
+  try{ await dbRef.set(DB); }catch(e){ showToast('Erro ao salvar — verifique sua internet'); }
 }
-// Quando outro dispositivo altera os dados, atualiza a tela atual sem perder o que o usuário está digitando nos formulários.
 function onRemoteUpdate(){
-  if(!currentUser) { populateLogin(); return; }
+  populateVendedoraSelect();
   const activeView = document.querySelector('.view.active');
   if(!activeView) return;
   const id = activeView.id.replace('view-','');
-  // Não re-renderiza a tela de "venda" pra não apagar o que a vendedora está digitando.
-  if(id === 'venda'){ renderVendaListOnly(); return; }
+  if(id === 'venda') renderVendaListOnly();
+  if(id === 'crediario') renderParcelasList();
   if(id === 'painel') renderPainel();
-  if(id === 'fechamento') { /* mantém os campos digitados */ }
   if(id === 'dashboard') renderDashboard();
-  if(id === 'crediario') renderCrediarioListOnly();
   if(id === 'config') renderConfig();
 }
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
+function addDays(dateStr, days){
+  const d = new Date(dateStr+'T12:00:00');
+  d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
 function brl(n){ return 'R$ ' + (Number(n)||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtDate(d){ return new Date(d+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function onlyDigits(s){ return (s||'').replace(/\D/g,''); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
 
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 1800);
+/* ====================== VENDEDORA ATIVA (sem login) ====================== */
+function populateVendedoraSelect(){
+  const sel = document.getElementById('vendedora-ativa');
+  const prev = sel.value;
+  sel.innerHTML = DB.vendedoras.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('') + `<option value="__loja__">🏪 Loja / Dono(a)</option>`;
+  if(DB.vendedoras.some(v=>v.nome===activeVendedora) || activeVendedora==='__loja__'){
+    sel.value = activeVendedora;
+  } else if(DB.vendedoras.length>0){
+    activeVendedora = DB.vendedoras[0].nome;
+    sel.value = activeVendedora;
+  } else {
+    activeVendedora = '__loja__';
+    sel.value = '__loja__';
+  }
 }
-
-/* ====================== LOGIN ====================== */
-function populateLogin(){
-  const sel = document.getElementById('login-select');
-  sel.innerHTML = '';
-  const opt0 = document.createElement('option');
-  opt0.value = SUPERVISOR_NAME; opt0.textContent = '👑 Supervisor(a) — ver tudo';
-  sel.appendChild(opt0);
-  DB.vendedoras.forEach(v=>{
-    const o = document.createElement('option');
-    o.value = v.nome; o.textContent = v.nome;
-    sel.appendChild(o);
-  });
-}
-function doLogin(){
-  const nome = document.getElementById('login-select').value;
-  currentUser = { nome, isSupervisor: nome === SUPERVISOR_NAME };
-  enterApp();
-}
-function logout(){
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login').style.display = 'flex';
-  populateLogin();
+function setActiveVendedora(){
+  activeVendedora = document.getElementById('vendedora-ativa').value;
+  localStorage.setItem('loja-vendedora-ativa', activeVendedora);
+  renderPainel();
 }
 
 /* ====================== NAV ====================== */
-const NAV_VENDEDORA = [
-  {id:'venda', icon:'🧾', label:'Lançar'},
-  {id:'painel', icon:'📈', label:'Meu painel'},
-  {id:'fechamento', icon:'🧮', label:'Fechamento'},
-];
-const NAV_SUPERVISOR = [
-  {id:'dashboard', icon:'📊', label:'Dashboard'},
-  {id:'venda', icon:'🧾', label:'Lançar'},
-  {id:'crediario', icon:'💰', label:'Crediário'},
-  {id:'config', icon:'⚙️', label:'Config'},
-];
-function buildNav(){
-  const nav = document.getElementById('bottom-nav');
-  const items = currentUser.isSupervisor ? NAV_SUPERVISOR : NAV_VENDEDORA;
-  nav.innerHTML = '';
-  items.forEach((it, i)=>{
-    const b = document.createElement('button');
-    b.innerHTML = `<span class="ic">${it.icon}</span><span>${it.label}</span>`;
-    b.onclick = ()=> switchView(it.id);
-    b.id = 'nav-'+it.id;
-    nav.appendChild(b);
-  });
-  switchView(items[0].id);
-}
 function switchView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
-  const navBtn = document.getElementById('nav-'+id);
-  if(navBtn) navBtn.classList.add('active');
-  if(id === 'venda') renderVendaView();
-  if(id === 'painel') renderPainel();
-  if(id === 'fechamento') renderFechamento();
-  if(id === 'dashboard') { populateMonthSelect(); renderDashboard(); }
-  if(id === 'crediario') renderCrediario();
-  if(id === 'config') renderConfig();
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='venda') renderVendaView();
+  if(id==='crediario') renderCrediarioView();
+  if(id==='painel') renderPainel();
+  if(id==='fechamento') renderFechamento();
+  if(id==='dashboard'){ populateMonthSelect(); renderDashboard(); }
+  if(id==='config') renderConfig();
 }
 
-/* ====================== ENTRAR NO APP ====================== */
-function enterApp(){
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('current-user-label').textContent = currentUser.nome;
-  document.getElementById('header-title').textContent = currentUser.isSupervisor ? 'Dashboard da Loja' : 'Caixa da Loja';
-  document.getElementById('header-sub').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
-  buildNav();
+/* ====================== VENDA NORMAL ====================== */
+function onCreditoChange(){
+  const v = parseFloat(document.getElementById('pay-credito').value)||0;
+  document.getElementById('credito-parcelas').style.display = v>0 ? 'block' : 'none';
+  updateTotal();
 }
-
-/* ====================== VENDA ====================== */
 function updateTotal(){
-  const total = ['pix','credito','debito','dinheiro','crediario'].reduce((s,k)=> s + (parseFloat(document.getElementById('pay-'+k).value)||0), 0);
+  const total = ['pix','credito','debito','dinheiro'].reduce((s,k)=> s + (parseFloat(document.getElementById('pay-'+k).value)||0), 0);
   document.getElementById('venda-total').textContent = brl(total);
   return total;
 }
@@ -537,88 +442,230 @@ async function salvarVenda(){
   const produto = document.getElementById('venda-produto').value.trim();
   const pix = parseFloat(document.getElementById('pay-pix').value)||0;
   const credito = parseFloat(document.getElementById('pay-credito').value)||0;
+  const creditoParcelas = credito>0 ? parseInt(document.getElementById('credito-parcelas').value)||1 : 1;
   const debito = parseFloat(document.getElementById('pay-debito').value)||0;
   const dinheiro = parseFloat(document.getElementById('pay-dinheiro').value)||0;
-  const crediario = parseFloat(document.getElementById('pay-crediario').value)||0;
-  const total = pix+credito+debito+dinheiro+crediario;
-  if(total <= 0) return showToast('Informe ao menos um valor de pagamento');
+  const total = pix+credito+debito+dinheiro;
+  if(total<=0) return showToast('Informe ao menos um valor de pagamento');
   if(!produto) return showToast('Informe o produto');
+  const vendedora = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
 
-  const vendedora = currentUser.isSupervisor ? (DB.vendedoras[0] ? DB.vendedoras[0].nome : 'Supervisor(a)') : currentUser.nome;
-
-  DB.vendas.push({
-    id: uid(), data: todayStr(), vendedora, categoria, produto,
-    pix, credito, debito, dinheiro, crediario, total
-  });
+  DB.vendas.push({ id:uid(), data:todayStr(), vendedora, categoria, produto, pix, credito, creditoParcelas, debito, dinheiro, total });
   await saveDB();
-  ['pix','credito','debito','dinheiro','crediario'].forEach(k=> document.getElementById('pay-'+k).value = '');
-  document.getElementById('venda-produto').value = '';
+  ['pix','credito','debito','dinheiro'].forEach(k=> document.getElementById('pay-'+k).value='');
+  document.getElementById('venda-produto').value='';
+  document.getElementById('credito-parcelas').style.display='none';
   updateTotal();
   showToast('Venda registrada ✓');
   renderVendaView();
 }
-function renderVendaView(){
-  updateTotal();
+async function excluirVenda(id){
+  if(!confirm('Excluir essa venda? Essa ação não pode ser desfeita.')) return;
+  DB.vendas = DB.vendas.filter(v=>v.id!==id);
+  await saveDB();
+  showToast('Venda excluída');
   renderVendaListOnly();
+  renderPainel();
 }
+function renderVendaView(){ updateTotal(); renderVendaListOnly(); }
 function renderVendaListOnly(){
   const list = document.getElementById('vendas-hoje-list');
-  const hoje = DB.vendas.filter(v=> v.data === todayStr()).slice().reverse();
-  if(hoje.length === 0){ list.innerHTML = '<div class="empty"><span class="ic">🗒️</span>Nenhuma venda registrada hoje ainda</div>'; return; }
-  list.innerHTML = hoje.map(v=> `
-    <div class="list-row">
-      <div><div class="l1">${v.produto || v.categoria}</div><div class="l2">${v.vendedora} · ${v.categoria}</div></div>
-      <div class="l1">${brl(v.total)}</div>
-    </div>`).join('');
+  const hoje = DB.vendas.filter(v=>v.data===todayStr()).slice().reverse();
+  if(hoje.length===0){ list.innerHTML='<div class="empty"><span class="ic">🗒️</span>Nenhuma venda registrada hoje ainda</div>'; return; }
+  list.innerHTML = hoje.map(v=>{
+    const parcInfo = v.credito>0 && v.creditoParcelas>1 ? ` · Crédito ${v.creditoParcelas}x` : '';
+    return `<div class="list-row">
+      <div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.vendedora} · ${v.categoria}${parcInfo}</div></div>
+      <div style="display:flex; align-items:center; gap:8px;"><div class="l1">${brl(v.total)}</div><button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button></div>
+    </div>`;
+  }).join('');
+}
+
+/* ====================== CREDIÁRIO ====================== */
+function setCredParcelas(n){
+  credParcelasSelecionadas = n;
+  document.querySelectorAll('#cred-parcelas-toggle .toggle-btn').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.n)===n));
+  renderParcelasPreview();
+}
+function calcParcelas(valorTotal, n, dataBase){
+  const dias = [0,30,60];
+  const valorParcela = Math.round((valorTotal/n)*100)/100;
+  const parcelas = [];
+  for(let i=0;i<n;i++){
+    const valor = (i===n-1) ? Math.round((valorTotal - valorParcela*(n-1))*100)/100 : valorParcela;
+    parcelas.push({ numero:i+1, valor, vencimento: addDays(dataBase, dias[i]) });
+  }
+  return parcelas;
+}
+function renderParcelasPreview(){
+  const valor = parseFloat(document.getElementById('cred-valor').value)||0;
+  const box = document.getElementById('cred-parcelas-preview');
+  if(valor<=0){ box.innerHTML=''; return; }
+  const parcelas = calcParcelas(valor, credParcelasSelecionadas, todayStr());
+  box.innerHTML = parcelas.map(p=>`<div style="display:flex; justify-content:space-between; font-size:12px; color:var(--ink-dim); padding:4px 0;">
+    <span>Parcela ${p.numero}/${credParcelasSelecionadas} — vence ${fmtDate(p.vencimento)}</span><b style="color:var(--ink)">${brl(p.valor)}</b>
+  </div>`).join('');
+}
+async function salvarCrediario(){
+  const categoria = document.getElementById('cred-categoria').value;
+  const produto = document.getElementById('cred-produto').value.trim();
+  const valor = parseFloat(document.getElementById('cred-valor').value)||0;
+  const nome = document.getElementById('cred-nome').value.trim();
+  const telefone = document.getElementById('cred-telefone').value.trim();
+  const endereco = document.getElementById('cred-endereco').value.trim();
+  if(!produto) return showToast('Informe o produto');
+  if(valor<=0) return showToast('Informe o valor da venda');
+  if(!nome) return showToast('Informe o nome do cliente');
+  if(!telefone) return showToast('Informe o telefone do cliente');
+
+  const vendedora = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
+  const dataVenda = todayStr();
+  const parcelas = calcParcelas(valor, credParcelasSelecionadas, dataVenda).map(p=>({...p, pago:false}));
+
+  const registro = { id:uid(), data:dataVenda, vendedora, categoria, produto, total:valor, cliente:{nome, telefone, endereco}, numParcelas:credParcelasSelecionadas, parcelas };
+  DB.creditos.push(registro);
+  // também conta nas vendas totais do mês/dashboard, na coluna "crediário"
+  DB.vendas.push({ id:uid(), data:dataVenda, vendedora, categoria, produto, pix:0, credito:0, creditoParcelas:1, debito:0, dinheiro:0, crediario:valor, total:valor, crediarioRefId: registro.id });
+  await saveDB();
+
+  document.getElementById('cred-produto').value='';
+  document.getElementById('cred-valor').value='';
+  document.getElementById('cred-nome').value='';
+  document.getElementById('cred-telefone').value='';
+  document.getElementById('cred-endereco').value='';
+  setCredParcelas(1);
+  showToast('Venda crediário registrada ✓');
+  enviarWhatsAppBoasVindas(registro);
+  renderCrediarioView();
+}
+function enviarWhatsAppBoasVindas(registro){
+  const fone = onlyDigits(registro.cliente.telefone);
+  if(!fone) return;
+  let msg = `Olá, ${registro.cliente.nome}! Obrigado por comprar nas Lojas Vital! 💜\n\n`;
+  msg += `Produto: ${registro.produto}\nValor total: ${brl(registro.total)}\n\n`;
+  if(registro.numParcelas===1){
+    msg += `Forma: à vista — vencimento em ${fmtDate(registro.parcelas[0].vencimento)}\n`;
+  } else {
+    msg += `Parcelado em ${registro.numParcelas}x:\n`;
+    registro.parcelas.forEach(p=> msg += `Parcela ${p.numero}/${registro.numParcelas}: ${brl(p.valor)} — vence ${fmtDate(p.vencimento)}\n`);
+  }
+  msg += `\nQualquer dúvida estamos à disposição!`;
+  const url = `https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+function enviarWhatsAppLembrete(credId, parcelaNum){
+  const reg = DB.creditos.find(c=>c.id===credId);
+  if(!reg) return;
+  const fone = onlyDigits(reg.cliente.telefone);
+  if(!fone) return showToast('Cliente sem telefone cadastrado');
+  const p = reg.parcelas.find(x=>x.numero===parcelaNum);
+  let msg = `Olá, ${reg.cliente.nome}! Tudo bem? 💜\n\nLembrete da sua compra nas Lojas Vital:\n${reg.produto}\nParcela ${p.numero}/${reg.numParcelas}: ${brl(p.valor)} — vencimento ${fmtDate(p.vencimento)}\n\nObrigado por comprar nas Lojas Vital!`;
+  const url = `https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+async function marcarParcelaPaga(credId, parcelaNum){
+  const reg = DB.creditos.find(c=>c.id===credId);
+  if(!reg) return;
+  const p = reg.parcelas.find(x=>x.numero===parcelaNum);
+  p.pago = true;
+  await saveDB();
+  showToast('Parcela marcada como paga');
+  renderParcelasList();
+}
+async function excluirCrediario(credId){
+  if(!confirm('Excluir essa venda crediário e todas as parcelas? Essa ação não pode ser desfeita.')) return;
+  const reg = DB.creditos.find(c=>c.id===credId);
+  DB.creditos = DB.creditos.filter(c=>c.id!==credId);
+  if(reg) DB.vendas = DB.vendas.filter(v=>v.crediarioRefId!==credId);
+  await saveDB();
+  showToast('Venda crediário excluída');
+  renderCrediarioView();
+}
+function renderCrediarioView(){
+  renderParcelasPreview();
+  renderParcelasList();
+}
+function renderParcelasList(){
+  const totalVendido = DB.creditos.reduce((s,c)=>s+c.total,0);
+  const totalRecebido = DB.creditos.reduce((s,c)=> s + c.parcelas.filter(p=>p.pago).reduce((s2,p)=>s2+p.valor,0), 0);
+  document.getElementById('cred-total-vendido').textContent = brl(totalVendido);
+  document.getElementById('cred-total-aberto').textContent = brl(Math.max(0,totalVendido-totalRecebido));
+
+  const todasParcelas = [];
+  DB.creditos.forEach(c=>{
+    c.parcelas.forEach(p=>{ if(!p.pago) todasParcelas.push({...p, cliente:c.cliente, produto:c.produto, credId:c.id, numParcelas:c.numParcelas}); });
+  });
+  todasParcelas.sort((a,b)=> a.vencimento.localeCompare(b.vencimento));
+  const list = document.getElementById('cred-parcelas-list');
+  if(todasParcelas.length===0){ list.innerHTML='<div class="empty"><span class="ic">✅</span>Nenhuma parcela em aberto</div>'; return; }
+  const hoje = todayStr();
+  list.innerHTML = todasParcelas.map(p=>{
+    const atrasada = p.vencimento < hoje;
+    return `<div class="parcela-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div class="l1">${p.cliente.nome}</div>
+          <div class="l2">${p.produto} · parcela ${p.numero}/${p.numParcelas} · vence ${fmtDate(p.vencimento)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="l1">${brl(p.valor)}</div>
+          <span class="badge ${atrasada?'late':'ok'}">${atrasada?'atrasada':'no prazo'}</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:10px;">
+        <button class="whats" style="margin-top:0;" onclick="enviarWhatsAppLembrete('${p.credId}',${p.numero})">📲 WhatsApp</button>
+        <button class="secondary" style="margin-top:0; width:auto; padding:10px 12px;" onclick="marcarParcelaPaga('${p.credId}',${p.numero})">✓ Pago</button>
+        <button class="del-btn" onclick="excluirCrediario('${p.credId}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ====================== PAINEL VENDEDORA ====================== */
 function renderPainel(){
-  const nome = currentUser.nome;
-  document.getElementById('painel-saudacao').textContent = 'Olá, ' + nome;
-  const hoje = DB.vendas.filter(v=> v.vendedora === nome && v.data === todayStr());
+  const nome = activeVendedora==='__loja__' ? null : activeVendedora;
+  document.getElementById('painel-saudacao').textContent = nome ? ('Olá, '+nome) : 'Painel geral da loja';
+  const filtro = v=> nome ? v.vendedora===nome : true;
+  const hoje = DB.vendas.filter(v=> filtro(v) && v.data===todayStr());
   const mesAtual = todayStr().slice(0,7);
-  const doMes = DB.vendas.filter(v=> v.vendedora === nome && v.data.slice(0,7) === mesAtual);
+  const doMes = DB.vendas.filter(v=> filtro(v) && v.data.slice(0,7)===mesAtual);
   const totalHoje = hoje.reduce((s,v)=>s+v.total,0);
   const totalMes = doMes.reduce((s,v)=>s+v.total,0);
-  const vendedoraCfg = DB.vendedoras.find(x=>x.nome===nome) || {meta:0};
-  const meta = vendedoraCfg.meta || 0;
-  const pct = meta > 0 ? Math.min(100, (totalMes/meta)*100) : 0;
-  const falta = Math.max(0, meta - totalMes);
+  const cfg = DB.vendedoras.find(x=>x.nome===nome) || {meta:0};
+  const meta = nome ? (cfg.meta||0) : DB.vendedoras.reduce((s,v)=>s+(v.meta||0),0);
+  const pct = meta>0 ? Math.min(100,(totalMes/meta)*100) : 0;
+  const falta = Math.max(0, meta-totalMes);
 
   document.getElementById('p-hoje').textContent = brl(totalHoje);
   document.getElementById('p-mes').textContent = brl(totalMes);
   document.getElementById('p-pct').textContent = pct.toFixed(0)+'%';
   document.getElementById('p-bar').style.width = pct+'%';
-  document.getElementById('p-meta-txt').textContent = 'Meta: ' + brl(meta);
+  document.getElementById('p-meta-txt').textContent = 'Meta: '+brl(meta);
   document.getElementById('p-falta-txt').textContent = falta>0 ? ('Falta: '+brl(falta)) : 'Meta batida! 🎉';
 
-  const bateuMeta = meta > 0 && totalMes >= meta;
+  const bateuMeta = meta>0 && totalMes>=meta;
   const pctComissao = bateuMeta ? (DB.comissao.alto||0) : (DB.comissao.baixo||0);
   const comissao = totalMes * (pctComissao/100);
   const ticketMedio = doMes.length>0 ? totalMes/doMes.length : 0;
-  document.getElementById('p-comissao-pct').textContent = pctComissao + '%';
+  document.getElementById('p-comissao-pct').textContent = pctComissao+'%';
   document.getElementById('p-comissao-valor').textContent = brl(comissao);
   document.getElementById('p-ticket-medio').textContent = brl(ticketMedio);
 
   const list = document.getElementById('minhas-vendas-list');
-  if(hoje.length===0){ list.innerHTML = '<div class="empty"><span class="ic">🗒️</span>Você ainda não lançou vendas hoje</div>'; return; }
-  list.innerHTML = hoje.slice().reverse().map(v=> `
-    <div class="list-row">
-      <div><div class="l1">${v.produto || v.categoria}</div><div class="l2">${v.categoria}</div></div>
-      <div class="l1">${brl(v.total)}</div>
-    </div>`).join('');
+  if(hoje.length===0){ list.innerHTML='<div class="empty"><span class="ic">🗒️</span>Nenhuma venda hoje ainda</div>'; return; }
+  list.innerHTML = hoje.slice().reverse().map(v=>`
+    <div class="list-row"><div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.categoria}${nome?'':' · '+v.vendedora}</div></div><div class="l1">${brl(v.total)}</div></div>`).join('');
 }
 
-/* ====================== FECHAMENTO DE CAIXA ====================== */
+/* ====================== FECHAMENTO ====================== */
 function fechamentoSistema(){
-  const responsavel = currentUser.isSupervisor ? null : currentUser.nome;
-  const hoje = DB.vendas.filter(v=> v.data === todayStr() && (responsavel ? v.vendedora===responsavel : true));
+  const nome = activeVendedora==='__loja__' ? null : activeVendedora;
+  const hoje = DB.vendas.filter(v=> v.data===todayStr() && (nome ? v.vendedora===nome : true));
   return {
-    dinheiro: hoje.reduce((s,v)=>s+v.dinheiro,0),
-    pix: hoje.reduce((s,v)=>s+v.pix,0),
-    credito: hoje.reduce((s,v)=>s+v.credito,0),
-    debito: hoje.reduce((s,v)=>s+v.debito,0),
+    dinheiro: hoje.reduce((s,v)=>s+(v.dinheiro||0),0),
+    pix: hoje.reduce((s,v)=>s+(v.pix||0),0),
+    credito: hoje.reduce((s,v)=>s+(v.credito||0),0),
+    debito: hoje.reduce((s,v)=>s+(v.debito||0),0),
   };
 }
 function renderFechamento(){
@@ -627,46 +674,46 @@ function renderFechamento(){
   document.getElementById('fc-sis-pix').textContent = brl(sis.pix);
   document.getElementById('fc-sis-credito').textContent = brl(sis.credito);
   document.getElementById('fc-sis-debito').textContent = brl(sis.debito);
-  ['dinheiro','pix','credito','debito'].forEach(k=> document.getElementById('fc-real-'+k).value = '');
+  ['dinheiro','pix','credito','debito'].forEach(k=> document.getElementById('fc-real-'+k).value='');
   document.getElementById('fc-dif-total').textContent = brl(0);
-  document.getElementById('fc-status').textContent = '';
+  document.getElementById('fc-status').textContent='';
   calcFechamento();
 }
 function calcFechamento(){
   const sis = fechamentoSistema();
-  let totalDif = 0;
+  let totalDif=0;
   ['dinheiro','pix','credito','debito'].forEach(k=>{
     const real = parseFloat(document.getElementById('fc-real-'+k).value);
     const cell = document.getElementById('fc-dif-'+k);
     if(isNaN(real)){ cell.textContent='—'; cell.style.color='var(--ink-dim)'; return; }
     const dif = real - sis[k];
     totalDif += dif;
-    cell.textContent = (dif>=0?'+':'') + brl(dif);
-    cell.style.color = Math.abs(dif) < 0.01 ? 'var(--green)' : 'var(--red)';
+    cell.textContent = (dif>=0?'+':'')+brl(dif);
+    cell.style.color = Math.abs(dif)<0.01 ? 'var(--green)' : 'var(--red)';
   });
   const tot = document.getElementById('fc-dif-total');
-  tot.textContent = (totalDif>=0?'+':'') + brl(totalDif);
-  tot.style.color = Math.abs(totalDif) < 0.01 ? 'var(--green)' : 'var(--red)';
+  tot.textContent = (totalDif>=0?'+':'')+brl(totalDif);
+  tot.style.color = Math.abs(totalDif)<0.01 ? 'var(--green)' : 'var(--red)';
 }
 async function salvarFechamento(){
   const sis = fechamentoSistema();
   const real = {};
-  let algumPreenchido = false;
+  let algumPreenchido=false;
   ['dinheiro','pix','credito','debito'].forEach(k=>{
     const v = parseFloat(document.getElementById('fc-real-'+k).value);
     real[k] = isNaN(v) ? null : v;
-    if(!isNaN(v)) algumPreenchido = true;
+    if(!isNaN(v)) algumPreenchido=true;
   });
   if(!algumPreenchido) return showToast('Preencha ao menos um valor conferido');
-  const responsavel = currentUser.isSupervisor ? 'Supervisor(a)' : currentUser.nome;
+  const responsavel = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
   DB.fechamentos = DB.fechamentos.filter(f=> !(f.data===todayStr() && f.responsavel===responsavel));
-  DB.fechamentos.push({ id: uid(), data: todayStr(), responsavel, sistema: sis, real });
+  DB.fechamentos.push({ id:uid(), data:todayStr(), responsavel, sistema:sis, real });
   await saveDB();
-  document.getElementById('fc-status').textContent = '✓ Fechamento salvo às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('fc-status').textContent = '✓ Fechamento salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   showToast('Fechamento confirmado');
 }
 
-/* ====================== DASHBOARD (SUPERVISOR) ====================== */
+/* ====================== DASHBOARD ====================== */
 function populateMonthSelect(){
   const sel = document.getElementById('dash-month');
   const months = new Set(DB.vendas.map(v=>v.data.slice(0,7)));
@@ -674,31 +721,28 @@ function populateMonthSelect(){
   const sorted = Array.from(months).sort();
   sel.innerHTML = sorted.map(m=>{
     const [y,mo] = m.split('-');
-    const label = new Date(y, mo-1, 1).toLocaleDateString('pt-BR',{month:'long', year:'numeric'});
+    const label = new Date(y,mo-1,1).toLocaleDateString('pt-BR',{month:'long', year:'numeric'});
     return `<option value="${m}" ${m===currentMonth?'selected':''}>${label}</option>`;
   }).join('');
 }
 function changeMonth(delta){
   const [y,m] = currentMonth.split('-').map(Number);
-  const d = new Date(y, m-1+delta, 1);
-  currentMonth = d.toISOString().slice(0,7);
-  populateMonthSelect();
-  renderDashboard();
+  currentMonth = new Date(y,m-1+delta,1).toISOString().slice(0,7);
+  populateMonthSelect(); renderDashboard();
 }
 function renderDashboard(){
   currentMonth = document.getElementById('dash-month').value || currentMonth;
-  const vendasMes = DB.vendas.filter(v=> v.data.slice(0,7) === currentMonth);
+  const vendasMes = DB.vendas.filter(v=>v.data.slice(0,7)===currentMonth);
   const total = vendasMes.reduce((s,v)=>s+v.total,0);
   const qtd = vendasMes.length;
   const ticket = qtd>0 ? total/qtd : 0;
-  const crediarioVendido = vendasMes.reduce((s,v)=>s+v.crediario,0);
-  const recebMes = DB.recebimentos.filter(r=>r.data.slice(0,7)===currentMonth).reduce((s,r)=>s+r.valor,0);
-  const aberto = DB.vendas.reduce((s,v)=>s+v.crediario,0) - DB.recebimentos.reduce((s,r)=>s+r.valor,0);
+  const totalCredVendido = DB.creditos.reduce((s,c)=>s+c.total,0);
+  const totalCredRecebido = DB.creditos.reduce((s,c)=> s + c.parcelas.filter(p=>p.pago).reduce((s2,p)=>s2+p.valor,0), 0);
 
   document.getElementById('d-total').textContent = brl(total);
   document.getElementById('d-qtd').textContent = qtd;
   document.getElementById('d-ticket').textContent = brl(ticket);
-  document.getElementById('d-aberto').textContent = brl(Math.max(0,aberto));
+  document.getElementById('d-aberto').textContent = brl(Math.max(0,totalCredVendido-totalCredRecebido));
 
   const formas = [
     {k:'pix', label:'PIX', color:'var(--pix)'},
@@ -708,107 +752,52 @@ function renderDashboard(){
     {k:'crediario', label:'Crediário', color:'var(--crediario)'},
   ];
   document.getElementById('d-formas').innerHTML = formas.map(f=>{
-    const v = vendasMes.reduce((s,x)=>s+x[f.k],0);
+    const v = vendasMes.reduce((s,x)=>s+(x[f.k]||0),0);
     const pct = total>0 ? (v/total*100) : 0;
-    return `<div style="margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
-        <span style="color:${f.color}">${f.label}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%; background:${f.color}"></div></div>
-    </div>`;
+    return `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span style="color:${f.color}">${f.label}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%; background:${f.color}"></div></div></div>`;
   }).join('');
 
   const cats = {};
-  vendasMes.forEach(v=> cats[v.categoria] = (cats[v.categoria]||0) + v.total);
+  vendasMes.forEach(v=> cats[v.categoria]=(cats[v.categoria]||0)+v.total);
   const catArr = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
   document.getElementById('d-categorias').innerHTML = catArr.length ? catArr.map(([cat,v])=>{
     const pct = total>0 ? (v/total*100):0;
-    return `<div style="margin-bottom:10px;">
-      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
-        <span>${cat}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
-    </div>`;
+    return `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span>${cat}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div></div>`;
   }).join('') : '<div class="empty">Sem vendas neste mês</div>';
 
   const rank = {};
-  vendasMes.forEach(v=> { rank[v.vendedora] = rank[v.vendedora] || {total:0,qtd:0}; rank[v.vendedora].total += v.total; rank[v.vendedora].qtd += 1; });
+  vendasMes.forEach(v=>{ rank[v.vendedora]=rank[v.vendedora]||{total:0,qtd:0}; rank[v.vendedora].total+=v.total; rank[v.vendedora].qtd+=1; });
   const rankArr = Object.entries(rank).sort((a,b)=>b[1].total-a[1].total);
   document.getElementById('d-ranking').innerHTML = rankArr.length ? rankArr.map(([nome,d],i)=>{
     const cfg = DB.vendedoras.find(x=>x.nome===nome);
     const meta = cfg ? cfg.meta : 0;
-    const bateu = meta>0 && d.total >= meta;
+    const bateu = meta>0 && d.total>=meta;
     const ticketMedio = d.qtd>0 ? d.total/d.qtd : 0;
     const pctComissao = bateu ? (DB.comissao.alto||0) : (DB.comissao.baixo||0);
-    const comissao = d.total * (pctComissao/100);
+    const comissao = d.total*(pctComissao/100);
     return `<div class="list-row" style="flex-direction:column; align-items:stretch;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div><div class="l1">${i+1}º ${nome}</div><div class="l2">${d.qtd} vendas · meta ${brl(meta)}</div></div>
-        <div style="text-align:right;">
-          <div class="l1">${brl(d.total)}</div>
-          ${meta>0 ? `<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>` : ''}
-        </div>
+        <div style="text-align:right;"><div class="l1">${brl(d.total)}</div>${meta>0?`<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>`:''}</div>
       </div>
       <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px dashed var(--card-border); font-size:11px; color:var(--ink-dim);">
-        <span>Ticket médio: <b style="color:var(--ink)">${brl(ticketMedio)}</b></span>
-        <span>Comissão (${pctComissao}%): <b style="color:var(--accent)">${brl(comissao)}</b></span>
+        <span>Ticket médio: <b style="color:var(--ink)">${brl(ticketMedio)}</b></span><span>Comissão (${pctComissao}%): <b style="color:var(--accent)">${brl(comissao)}</b></span>
       </div>
     </div>`;
   }).join('') : '<div class="empty">Sem vendas neste mês</div>';
 
   const fechMes = DB.fechamentos.filter(f=>f.data.slice(0,7)===currentMonth).sort((a,b)=>b.data.localeCompare(a.data));
   document.getElementById('d-fechamentos').innerHTML = fechMes.length ? fechMes.map(f=>{
-    let dif = 0;
-    ['dinheiro','pix','credito','debito'].forEach(k=>{ if(f.real[k]!==null) dif += (f.real[k]-f.sistema[k]); });
-    const ok = Math.abs(dif) < 0.01;
-    return `<div class="list-row">
-      <div><div class="l1">${new Date(f.data+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="l2">${f.responsavel}</div></div>
-      <span class="badge ${ok?'ok':'low'}">${ok?'sem diferença':((dif>=0?'+':'')+brl(dif))}</span>
-    </div>`;
-  }).join('') : '<div class="empty">Nenhum fechamento registrado neste mês</div>';
-}
-
-/* ====================== CREDIÁRIO ====================== */
-function renderCrediario(){
-  const sel = document.getElementById('cred-vendedora');
-  sel.innerHTML = DB.vendedoras.map(v=>`<option>${v.nome}</option>`).join('');
-  renderCrediarioListOnly();
-}
-function renderCrediarioListOnly(){
-  const totalVendido = DB.vendas.reduce((s,v)=>s+v.crediario,0);
-  const totalRecebido = DB.recebimentos.reduce((s,r)=>s+r.valor,0);
-  document.getElementById('cred-total-vendido').textContent = brl(totalVendido);
-  document.getElementById('cred-total-aberto').textContent = brl(Math.max(0,totalVendido-totalRecebido));
-  const list = document.getElementById('cred-list');
-  const recent = DB.recebimentos.slice().reverse().slice(0,15);
-  list.innerHTML = recent.length ? recent.map(r=>`
-    <div class="list-row">
-      <div><div class="l1">${r.cliente}</div><div class="l2">${r.vendedora} · ${r.forma} · ${new Date(r.data+'T12:00').toLocaleDateString('pt-BR')}</div></div>
-      <div class="l1">${brl(r.valor)}</div>
-    </div>`).join('') : '<div class="empty">Nenhum recebimento ainda</div>';
-}
-async function salvarRecebimento(){
-  const cliente = document.getElementById('cred-cliente').value.trim();
-  const vendedora = document.getElementById('cred-vendedora').value;
-  const valor = parseFloat(document.getElementById('cred-valor').value)||0;
-  const forma = document.getElementById('cred-forma').value;
-  if(!cliente) return showToast('Informe o cliente');
-  if(valor<=0) return showToast('Informe o valor');
-  DB.recebimentos.push({id:uid(), data:todayStr(), cliente, vendedora, valor, forma});
-  await saveDB();
-  document.getElementById('cred-cliente').value='';
-  document.getElementById('cred-valor').value='';
-  showToast('Recebimento registrado');
-  renderCrediario();
+    let dif=0; ['dinheiro','pix','credito','debito'].forEach(k=>{ if(f.real[k]!==null) dif += (f.real[k]-f.sistema[k]); });
+    const ok = Math.abs(dif)<0.01;
+    return `<div class="list-row"><div><div class="l1">${fmtDate(f.data)}</div><div class="l2">${f.responsavel}</div></div><span class="badge ${ok?'ok':'low'}">${ok?'sem diferença':((dif>=0?'+':'')+brl(dif))}</span></div>`;
+  }).join('') : '<div class="empty">Nenhum fechamento neste mês</div>';
 }
 
 /* ====================== CONFIG ====================== */
 function renderConfig(){
   document.getElementById('config-vendedoras-list').innerHTML = DB.vendedoras.map(v=>`
-    <div class="list-row">
-      <div><div class="l1">${v.nome}</div><div class="l2">Meta: ${brl(v.meta)}</div></div>
-      <button class="icon-btn" onclick="cfgRemoveVendor('${v.id}')">🗑️</button>
-    </div>`).join('') || '<div class="empty">Nenhuma vendedora cadastrada</div>';
+    <div class="list-row"><div><div class="l1">${v.nome}</div><div class="l2">Meta: ${brl(v.meta)}</div></div><button class="del-btn" onclick="cfgRemoveVendor('${v.id}')">🗑️</button></div>`).join('') || '<div class="empty">Nenhuma vendedora cadastrada</div>';
   document.getElementById('cfg-com-baixo').value = DB.comissao.baixo;
   document.getElementById('cfg-com-alto').value = DB.comissao.alto;
 }
@@ -818,35 +807,31 @@ async function cfgAddVendor(){
   if(!nome) return showToast('Digite um nome');
   DB.vendedoras.push({id:uid(), nome, meta});
   await saveDB();
-  document.getElementById('cfg-novo-nome').value='';
-  document.getElementById('cfg-novo-meta').value='';
-  renderConfig();
+  document.getElementById('cfg-novo-nome').value=''; document.getElementById('cfg-novo-meta').value='';
+  renderConfig(); populateVendedoraSelect();
   showToast('Vendedora adicionada');
 }
 async function cfgRemoveVendor(id){
   DB.vendedoras = DB.vendedoras.filter(v=>v.id!==id);
-  await saveDB();
-  renderConfig();
+  await saveDB(); renderConfig(); populateVendedoraSelect();
 }
 async function cfgSaveComissao(){
   DB.comissao.baixo = parseFloat(document.getElementById('cfg-com-baixo').value)||0;
   DB.comissao.alto = parseFloat(document.getElementById('cfg-com-alto').value)||0;
-  await saveDB();
-  showToast('Comissão atualizada');
+  await saveDB(); showToast('Comissão atualizada');
 }
 function exportBackup(){
   const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'backup-caixa-loja-'+todayStr()+'.json';
-  a.click();
+  const a = document.createElement('a'); a.href=url; a.download='backup-caixa-loja-'+todayStr()+'.json'; a.click();
 }
 
 /* ====================== INIT ====================== */
 (async function init(){
   await loadDB();
-  populateLogin();
-  // Em PC compartilhado, sempre pede pra escolher quem está usando — não mantém sessão salva.
+  populateVendedoraSelect();
+  document.getElementById('header-sub').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+  switchView('venda');
 })();
 </script>
 </body>
