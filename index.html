@@ -125,6 +125,10 @@
       <div id="venda-cliente-extra" style="display:none;">
         <label>Telefone / WhatsApp</label>
         <input type="tel" id="venda-cliente-telefone" placeholder="(00) 00000-0000">
+        <label>Endereço (opcional)</label>
+        <input type="text" id="venda-cliente-endereco" placeholder="Rua, número, bairro">
+        <label>Aniversário (opcional)</label>
+        <input type="date" id="venda-cliente-aniversario">
       </div>
 
       <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border);">🛍️ Produtos da venda</label>
@@ -208,6 +212,14 @@
         <button type="button" class="toggle-btn active" data-n="1" onclick="setCredParcelas(1)">1x à vista</button>
         <button type="button" class="toggle-btn" data-n="2" onclick="setCredParcelas(2)">2x (30/60)</button>
         <button type="button" class="toggle-btn" data-n="3" onclick="setCredParcelas(3)">3x (30/60/90)</button>
+        <button type="button" class="toggle-btn" data-n="custom" onclick="setCredParcelas('custom')">✎ Personalizado</button>
+      </div>
+      <div id="cred-custom-editor" style="display:none; margin-top:10px;">
+        <label>Quantidade de parcelas</label>
+        <input type="number" id="cred-custom-qtd" min="1" max="12" value="2" oninput="renderCustomDiasInputs()">
+        <label>Dias de vencimento de cada parcela (a partir da data da venda)</label>
+        <div id="cred-custom-dias-list"></div>
+        <p style="font-size:11px; color:var(--ink-dim); margin:6px 0 0;">Ex: 15/30 dias, ou 30/60/90/120 dias — edite cada campo abaixo.</p>
       </div>
       <div id="cred-parcelas-preview" style="margin-top:10px;"></div>
 
@@ -329,6 +341,15 @@
 
   <!-- FECHAMENTO -->
   <div class="view" id="view-fechamento">
+    <div class="card">
+      <h2>🔓 Abertura de caixa (troco inicial)</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Informe quanto dinheiro tinha na gaveta ao abrir a loja hoje, para o fechamento bater certinho.</p>
+      <div class="row-flex">
+        <input type="number" inputmode="decimal" id="abertura-valor" placeholder="0,00">
+        <button class="primary" style="margin-top:0; width:auto; padding:12px 18px;" onclick="salvarAbertura()">Salvar</button>
+      </div>
+      <div id="abertura-status" style="margin-top:8px; font-size:12px; color:var(--ink-dim)"></div>
+    </div>
     <div class="card">
       <h2>Fechamento de caixa — hoje</h2>
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -460,6 +481,7 @@ function ensureDBShape(){
   if(!DB.fechamentos) DB.fechamentos=[];
   if(!DB.clientes) DB.clientes=[];
   if(!DB.retiradas) DB.retiradas=[];
+  if(!DB.aberturas) DB.aberturas={};
   if(!DB.comissao) DB.comissao={baixo:1, alto:2};
 }
 
@@ -551,7 +573,11 @@ function autocompleteCliente(prefix){
   const c = findCliente(nome);
   if(prefix==='venda'){
     document.getElementById('venda-cliente-extra').style.display = nome.trim() ? 'block' : 'none';
-    if(c) document.getElementById('venda-cliente-telefone').value = c.telefone||'';
+    if(c){
+      document.getElementById('venda-cliente-telefone').value = c.telefone||'';
+      document.getElementById('venda-cliente-endereco').value = c.endereco||'';
+      if(c.aniversario) document.getElementById('venda-cliente-aniversario').value = c.aniversario;
+    }
   } else if(prefix==='cred'){
     if(c){
       document.getElementById('cred-telefone').value = c.telefone||'';
@@ -646,8 +672,9 @@ async function salvarVenda(){
   const vendedora = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
   const clienteNomeInput = document.getElementById('venda-cliente-nome').value.trim();
   const clienteTelefone = document.getElementById('venda-cliente-telefone').value.trim();
-  let clienteId = null;
-  if(clienteNomeInput) clienteId = upsertCliente(clienteNomeInput, clienteTelefone, '', '');
+  const clienteEndereco = document.getElementById('venda-cliente-endereco').value.trim();
+  const clienteAniversario = document.getElementById('venda-cliente-aniversario').value;
+  if(clienteNomeInput) upsertCliente(clienteNomeInput, clienteTelefone, clienteEndereco, clienteAniversario);
 
   const categoria = cartVenda[0].categoria;
   const produtoResumo = cartVenda.map(i=>i.produto).join(', ');
@@ -665,6 +692,8 @@ async function salvarVenda(){
   ['pix','credito','debito','dinheiro'].forEach(k=> document.getElementById('pay-'+k).value='');
   document.getElementById('venda-cliente-nome').value='';
   document.getElementById('venda-cliente-telefone').value='';
+  document.getElementById('venda-cliente-endereco').value='';
+  document.getElementById('venda-cliente-aniversario').value='';
   document.getElementById('venda-cliente-extra').style.display='none';
   document.getElementById('credito-parcelas').style.display='none';
   renderCarrinho('venda');
@@ -688,25 +717,59 @@ function renderVendaListOnly(){
   list.innerHTML = hoje.map(v=>{
     const parcInfo = v.credito>0 && v.creditoParcelas>1 ? ` · Crédito ${v.creditoParcelas}x` : '';
     const clienteInfo = v.clienteNome ? ` · ${v.clienteNome}` : '';
+    const temTelefone = v.clienteTelefone || (v.cliente && v.cliente.telefone);
     return `<div class="list-row">
       <div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.vendedora} · ${v.categoria}${parcInfo}${clienteInfo}</div></div>
-      <div style="display:flex; align-items:center; gap:8px;"><div class="l1">${brl(v.total)}</div><button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button></div>
+      <div style="display:flex; align-items:center; gap:6px;"><div class="l1">${brl(v.total)}</div>${temTelefone?`<button class="del-btn" style="color:var(--whats);" onclick="reenviarWhatsApp('${v.id}')">📲</button>`:''}<button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button></div>
     </div>`;
   }).join('');
 }
 
 /* ====================== CREDIÁRIO ====================== */
+let customDiasArr = [30,60];
 function setCredParcelas(n){
   credParcelasSelecionadas = n;
-  document.querySelectorAll('#cred-parcelas-toggle .toggle-btn').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.n)===n));
+  document.querySelectorAll('#cred-parcelas-toggle .toggle-btn').forEach(b=> b.classList.toggle('active', String(b.dataset.n)===String(n)));
+  const editor = document.getElementById('cred-custom-editor');
+  if(n==='custom'){
+    editor.style.display = 'block';
+    renderCustomDiasInputs();
+  } else {
+    editor.style.display = 'none';
+    renderParcelasPreview();
+  }
+}
+function renderCustomDiasInputs(){
+  const qtd = Math.max(1, Math.min(12, parseInt(document.getElementById('cred-custom-qtd').value)||1));
+  // preserva valores já digitados, completa o resto com sugestão de 30 em 30
+  while(customDiasArr.length < qtd) customDiasArr.push((customDiasArr.length>0 ? customDiasArr[customDiasArr.length-1] : 0) + 30);
+  customDiasArr = customDiasArr.slice(0, qtd);
+  const list = document.getElementById('cred-custom-dias-list');
+  list.innerHTML = customDiasArr.map((d,i)=>`
+    <div class="row-flex" style="margin-bottom:6px;">
+      <span style="font-size:12px; color:var(--ink-dim); width:70px; flex-shrink:0;">Parcela ${i+1}:</span>
+      <input type="number" value="${d}" min="0" style="flex:1;" oninput="updateCustomDia(${i}, this.value)">
+      <span style="font-size:12px; color:var(--ink-dim);">dias</span>
+    </div>`).join('');
   renderParcelasPreview();
 }
+function updateCustomDia(idx, val){
+  customDiasArr[idx] = parseInt(val)||0;
+  renderParcelasPreview();
+}
+function diasPadrao(n){
+  if(n===1) return [0];
+  if(n===2) return [30,60];
+  if(n===3) return [30,60,90];
+  return Array.from({length:n}, (_,i)=>(i+1)*30);
+}
 function calcParcelas(valorTotal, n, dataBase){
-  const dias=[0,30,60];
-  const valorParcela = Math.round((valorTotal/n)*100)/100;
+  const dias = n==='custom' ? customDiasArr : diasPadrao(n);
+  const qtd = dias.length;
+  const valorParcela = Math.round((valorTotal/qtd)*100)/100;
   const parcelas=[];
-  for(let i=0;i<n;i++){
-    const valor = (i===n-1) ? Math.round((valorTotal - valorParcela*(n-1))*100)/100 : valorParcela;
+  for(let i=0;i<qtd;i++){
+    const valor = (i===qtd-1) ? Math.round((valorTotal - valorParcela*(qtd-1))*100)/100 : valorParcela;
     parcelas.push({numero:i+1, valor, vencimento:addDays(dataBase, dias[i])});
   }
   return parcelas;
@@ -716,8 +779,9 @@ function renderParcelasPreview(){
   const box = document.getElementById('cred-parcelas-preview');
   if(valor<=0){ box.innerHTML=''; return; }
   const parcelas = calcParcelas(valor, credParcelasSelecionadas, todayStr());
+  const qtdLabel = parcelas.length;
   box.innerHTML = `<div style="font-size:12px; color:var(--ink-dim); margin-bottom:4px;">Total: <b style="color:var(--ink)">${brl(valor)}</b></div>` + parcelas.map(p=>`<div style="display:flex; justify-content:space-between; font-size:12px; color:var(--ink-dim); padding:4px 0;">
-    <span>Parcela ${p.numero}/${credParcelasSelecionadas} — vence ${fmtDate(p.vencimento)}</span><b style="color:var(--ink)">${brl(p.valor)}</b>
+    <span>Parcela ${p.numero}/${qtdLabel} — vence ${fmtDate(p.vencimento)}</span><b style="color:var(--ink)">${brl(p.valor)}</b>
   </div>`).join('');
 }
 async function salvarCrediario(){
@@ -735,10 +799,11 @@ async function salvarCrediario(){
   const categoria = cartCred[0].categoria;
   const produto = cartCred.map(i=>i.produto).join(', ');
   const parcelas = calcParcelas(valor, credParcelasSelecionadas, dataVenda).map(p=>({...p, pago:false}));
+  const qtdParcelasReal = parcelas.length;
 
   upsertCliente(nome, telefone, endereco, aniversario);
   const registro = { id:uid(), data:dataVenda, vendedora, categoria, produto, itens:cartCred.slice(), total:valor,
-    cliente:{nome, telefone, endereco, aniversario}, numParcelas:credParcelasSelecionadas, parcelas };
+    cliente:{nome, telefone, endereco, aniversario}, numParcelas:qtdParcelasReal, parcelas };
   DB.creditos.push(registro);
   DB.vendas.push({ id:uid(), data:dataVenda, vendedora, categoria, produto, itens:cartCred.slice(), pix:0, credito:0, creditoParcelas:1, debito:0, dinheiro:0, crediario:valor, total:valor, crediarioRefId:registro.id, clienteNome:nome, clienteTelefone:telefone, conciliado:{pix:false,credito:false,debito:false} });
   await saveDB();
@@ -771,19 +836,29 @@ function enviarWhatsAppRelacionamento(registro, clienteId, isCrediario){
   if(!fone) return showToast('Cliente sem telefone cadastrado');
   let msg = `Olá, ${nome}! Muito obrigado por comprar nas Lojas Vital! 💜\n\n`;
   if(itens && itens.length){
-    msg += `Você levou:\n`;
-    itens.forEach(i=> msg += `• ${i.produto} — ${brl(i.valor)}\n`);
-    msg += `\nTotal: ${brl(total)}\n`;
+    const nomes = itens.map(i=>i.produto).join(', ');
+    msg += `Você levou: ${nomes}.\nTotal: ${brl(total)}\n\n`;
   }
   if(isCrediario && parcelas){
-    if(numParcelas===1){ msg += `Vencimento: ${fmtDate(parcelas[0].vencimento)}\n`; }
-    else {
-      msg += `Parcelado em ${numParcelas}x:\n`;
-      parcelas.forEach(p=> msg += `Parcela ${p.numero}/${numParcelas}: ${brl(p.valor)} — vence ${fmtDate(p.vencimento)}\n`);
+    if(numParcelas===1){
+      msg += `Combinamos o pagamento para o dia ${fmtDate(parcelas[0].vencimento)}.\n\n`;
+    } else {
+      msg += `Ficou combinado em ${numParcelas}x, assim:\n`;
+      parcelas.forEach(p=> msg += `Parcela ${p.numero}/${numParcelas}: ${brl(p.valor)} — vencimento ${fmtDate(p.vencimento)}\n`);
+      msg += `\n`;
     }
   }
-  msg += `\nFoi um prazer te atender! Volte sempre, temos sempre novidades te esperando 💜✨`;
+  msg += `Foi um prazer te atender! Volte sempre, temos sempre novidades te esperando 💜✨`;
   window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+function reenviarWhatsApp(vendaId){
+  const v = DB.vendas.find(x=>x.id===vendaId);
+  if(!v) return;
+  if(v.crediarioRefId){
+    const reg = DB.creditos.find(c=>c.id===v.crediarioRefId);
+    if(reg) return enviarWhatsAppRelacionamento(reg, null, true);
+  }
+  enviarWhatsAppRelacionamento(v, null, false);
 }
 function enviarWhatsAppLembrete(credId, parcelaNum){
   const reg = DB.creditos.find(c=>c.id===credId);
@@ -991,14 +1066,37 @@ function renderPainel(){
   list.innerHTML = hoje.slice().reverse().map(v=>`<div class="list-row"><div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.categoria}${nome?'':' · '+v.vendedora}</div></div><div class="l1">${brl(v.total)}</div></div>`).join('');
 }
 
+/* ====================== ABERTURA DE CAIXA ====================== */
+function getAberturaHoje(){
+  if(!DB.aberturas) DB.aberturas = {};
+  return DB.aberturas[todayStr()] || 0;
+}
+async function salvarAbertura(){
+  const valor = parseFloat(document.getElementById('abertura-valor').value)||0;
+  if(!DB.aberturas) DB.aberturas = {};
+  DB.aberturas[todayStr()] = valor;
+  await saveDB();
+  document.getElementById('abertura-status').textContent = '✓ Abertura de '+brl(valor)+' salva para hoje';
+  showToast('Abertura de caixa salva');
+  renderFechamento();
+}
+
 /* ====================== FECHAMENTO ====================== */
 function fechamentoSistema(){
   const nome = activeVendedora==='__loja__' ? null : activeVendedora;
   const hoje = DB.vendas.filter(v=> v.data===todayStr() && (nome ? v.vendedora===nome : true));
-  return { dinheiro: hoje.reduce((s,v)=>s+(v.dinheiro||0),0), pix: hoje.reduce((s,v)=>s+(v.pix||0),0), credito: hoje.reduce((s,v)=>s+(v.credito||0),0), debito: hoje.reduce((s,v)=>s+(v.debito||0),0) };
+  const retiradasHoje = (DB.retiradas||[]).filter(r=>r.data===todayStr()).reduce((s,r)=>s+r.valor,0);
+  return {
+    dinheiro: hoje.reduce((s,v)=>s+(v.dinheiro||0),0) + getAberturaHoje() - retiradasHoje,
+    pix: hoje.reduce((s,v)=>s+(v.pix||0),0),
+    credito: hoje.reduce((s,v)=>s+(v.credito||0),0),
+    debito: hoje.reduce((s,v)=>s+(v.debito||0),0)
+  };
 }
 function renderFechamento(){
   const sis = fechamentoSistema();
+  document.getElementById('abertura-valor').value = getAberturaHoje() || '';
+  document.getElementById('abertura-status').textContent = getAberturaHoje()>0 ? ('Abertura de hoje: '+brl(getAberturaHoje())) : '';
   document.getElementById('fc-sis-dinheiro').textContent = brl(sis.dinheiro);
   document.getElementById('fc-sis-pix').textContent = brl(sis.pix);
   document.getElementById('fc-sis-credito').textContent = brl(sis.credito);
