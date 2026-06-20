@@ -843,9 +843,8 @@ function enviarWhatsAppRelacionamento(registro, clienteId, isCrediario){
     if(numParcelas===1){
       msg += `Combinamos o pagamento para o dia ${fmtDate(parcelas[0].vencimento)}.\n\n`;
     } else {
-      msg += `Ficou combinado em ${numParcelas}x, assim:\n`;
-      parcelas.forEach(p=> msg += `Parcela ${p.numero}/${numParcelas}: ${brl(p.valor)} — vencimento ${fmtDate(p.vencimento)}\n`);
-      msg += `\n`;
+      const linhas = parcelas.map(p=> `Parcela ${p.numero}/${numParcelas} ${brl(p.valor)}, vencimento ${fmtDate(p.vencimento)}.`);
+      msg += linhas.join('\n\n') + '\n\n';
     }
   }
   msg += `Foi um prazer te atender! Volte sempre, temos sempre novidades te esperando 💜✨`;
@@ -860,14 +859,10 @@ function reenviarWhatsApp(vendaId){
   }
   enviarWhatsAppRelacionamento(v, null, false);
 }
-function enviarWhatsAppLembrete(credId, parcelaNum){
+function enviarWhatsAppCrediario(credId){
   const reg = DB.creditos.find(c=>c.id===credId);
   if(!reg) return;
-  const fone = onlyDigits(reg.cliente.telefone);
-  if(!fone) return showToast('Cliente sem telefone cadastrado');
-  const p = reg.parcelas.find(x=>x.numero===parcelaNum);
-  let msg = `Olá, ${reg.cliente.nome}! Tudo bem? 💜\n\nPassando para lembrar da parcela ${p.numero}/${reg.numParcelas} da sua compra (${reg.produto}): ${brl(p.valor)}, vencimento ${fmtDate(p.vencimento)}.\n\nQualquer dúvida estamos à disposição. Obrigado por comprar nas Lojas Vital!`;
-  window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
+  enviarWhatsAppRelacionamento(reg, null, true);
 }
 async function marcarParcelaPaga(credId, parcelaNum){
   const reg = DB.creditos.find(c=>c.id===credId);
@@ -906,7 +901,7 @@ function renderParcelasList(){
         <div style="text-align:right;"><div class="l1">${brl(p.valor)}</div><span class="badge ${atrasada?'late':'ok'}">${atrasada?'atrasada':'no prazo'}</span></div>
       </div>
       <div style="display:flex; gap:6px; margin-top:10px;">
-        <button class="whats" style="margin-top:0;" onclick="enviarWhatsAppLembrete('${p.credId}',${p.numero})">📲 Lembrete</button>
+        <button class="whats" style="margin-top:0;" onclick="enviarWhatsAppCrediario('${p.credId}')">📲 WhatsApp</button>
         <button class="secondary" style="margin-top:0; width:auto; padding:10px 12px;" onclick="marcarParcelaPaga('${p.credId}',${p.numero})">✓ Pago</button>
         <button class="del-btn" onclick="excluirCrediario('${p.credId}')">🗑️</button>
       </div>
