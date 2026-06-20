@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Caixa da Loja</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap');
+  :root{
+    --bg: #FBF3F0;
+    --bg-soft: #F7E9E4;
+    --card: #FFFFFF;
+    --card-border: #F0DAD2;
+    --ink: #4A3439;
+    --ink-dim: #A98E8C;
+    --accent: #C97B84; /* rosa terracota */
+    --accent-soft: #F6DDE1;
+    --green: #8FAE8C;
+    --red: #D98679;
+    --pix: #8FAE8C;
+    --credito: #C97B84;
+    --debito: #9BA8C9;
+    --dinheiro: #D9A05B;
+    --crediario: #B48FC4;
+    --radius: 18px;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-body);
+    padding-bottom: 90px;
+    min-height:100vh;
+  }
+  header.top{
+    padding: 18px 18px 14px;
+    background: linear-gradient(180deg, var(--bg-soft), var(--bg));
+    border-bottom: 1px solid var(--card-border);
+    position: sticky; top:0; z-index:50;
+  }
+  .brand{ display:flex; align-items:center; justify-content:space-between; }
+  .brand h1{
+    font-family: var(--font-display); font-size:20px; font-weight:600; margin:0;
+    letter-spacing:0.2px;
+  }
+  .brand .sub{ font-size:11px; color:var(--ink-dim); margin-top:2px; letter-spacing: 0.5px; text-transform:uppercase;}
+  .user-pill{
+    background:var(--card); border:1px solid var(--card-border); border-radius:999px;
+    padding:6px 12px; font-size:12px; color:var(--ink-dim); display:flex; align-items:center; gap:6px;
+  }
+  main{ padding:16px; max-width:520px; margin:0 auto; }
+  .card{
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    padding:16px; margin-bottom:14px; box-shadow: 0 2px 12px rgba(201,123,132,0.06);
+  }
+  .card h2{ font-family:var(--font-display); font-size:15px; margin:0 0 12px; color:var(--ink); font-weight:600;}
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat{
+    background:var(--bg-soft); border-radius:10px; padding:12px; border:1px solid var(--card-border);
+  }
+  .stat .label{ font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.5px; }
+  .stat .value{ font-family:var(--font-display); font-size:22px; margin-top:4px; font-weight:600; }
+  .stat.full{ grid-column: 1/-1; }
+  label{ display:block; font-size:12px; color:var(--ink-dim); margin: 12px 0 6px; }
+  label:first-child{ margin-top:0; }
+  select, input[type=text], input[type=number]{
+    width:100%; background:var(--bg-soft); border:1px solid var(--card-border); color:var(--ink);
+    padding:12px; border-radius:10px; font-size:15px; font-family:var(--font-body);
+  }
+  select:focus, input:focus{ outline:none; border-color:var(--accent); }
+  .pay-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;}
+  .pay-field{ background:var(--bg-soft); border:1px solid var(--card-border); border-radius:10px; padding:10px;}
+  .pay-field .tag{ font-size:11px; font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:5px;}
+  .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .pay-field input{ background:transparent; border:none; padding:0; font-size:17px; font-family:var(--font-display); }
+  .total-line{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:14px; padding-top:14px; border-top:1px dashed var(--card-border);
+  }
+  .total-line .label{ font-size:13px; color:var(--ink-dim); }
+  .total-line .value{ font-family:var(--font-display); font-size:26px; color:var(--accent); font-weight:600; }
+  button.primary{
+    width:100%; background:var(--accent); color:#FFFFFF; border:none; border-radius:12px;
+    padding:14px; font-size:15px; font-weight:700; margin-top:14px; cursor:pointer;
+    font-family:var(--font-body); letter-spacing:0.2px; box-shadow: 0 4px 14px rgba(201,123,132,0.25);
+  }
+  button.primary:active{ transform: scale(0.98); }
+  button.secondary{
+    width:100%; background:transparent; color:var(--ink-dim); border:1px solid var(--card-border); border-radius:10px;
+    padding:12px; font-size:13px; margin-top:8px; cursor:pointer;
+  }
+  nav.bottom{
+    position:fixed; bottom:0; left:0; right:0; background:var(--bg-soft);
+    border-top:1px solid var(--card-border); display:flex; z-index:50;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.bottom button{
+    flex:1; background:none; border:none; color:var(--ink-dim); padding:10px 2px 8px;
+    font-size:10px; font-family:var(--font-body); display:flex; flex-direction:column; align-items:center; gap:4px;
+    cursor:pointer;
+  }
+  nav.bottom button .ic{ font-size:18px; }
+  nav.bottom button.active{ color:var(--accent); }
+  .view{ display:none; }
+  .view.active{ display:block; animation:fadein .2s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .list-row{
+    display:flex; justify-content:space-between; align-items:center; padding:10px 0;
+    border-bottom:1px solid var(--card-border); font-size:13px;
+  }
+  .list-row:last-child{ border-bottom:none; }
+  .list-row .l1{ font-weight:600; }
+  .list-row .l2{ color:var(--ink-dim); font-size:11px; margin-top:2px; }
+  .badge{ font-size:11px; padding:3px 8px; border-radius:999px; font-weight:600; }
+  .badge.ok{ background:var(--accent-soft); color:var(--accent); }
+  .badge.low{ background:#F8E3DD; color:#B5564A; }
+  .bar-wrap{ background:var(--bg-soft); border-radius:6px; height:8px; margin-top:6px; overflow:hidden;}
+  .bar-fill{ height:100%; background:var(--accent); border-radius:6px; transition:width .4s ease;}
+  select#cat-select{ font-weight:600; }
+  .empty{ text-align:center; padding: 30px 10px; color:var(--ink-dim); font-size:13px; }
+  .empty .ic{ font-size:30px; display:block; margin-bottom:8px; }
+  .login-screen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:24px;
+  }
+  .login-screen h1{ font-family:var(--font-display); font-size:26px; margin-bottom:4px;}
+  .login-screen p{ color:var(--ink-dim); font-size:13px; margin-bottom:24px; text-align:center;}
+  .login-screen select, .login-screen input{ max-width:280px; margin-bottom:10px;}
+  .login-screen button{ max-width:280px; }
+  .toast{
+    position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#FFFFFF; padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:700; z-index:100; opacity:0; pointer-events:none; transition: opacity .25s, bottom .25s;
+    box-shadow: 0 4px 14px rgba(201,123,132,0.3);
+  }
+  .toast.show{ opacity:1; bottom:110px; }
+  .month-select{ margin-bottom:14px; }
+  .row-flex{ display:flex; gap:8px; align-items:center; }
+  .icon-btn{
+    background:var(--bg-soft); border:1px solid var(--card-border); color:var(--ink-dim);
+    border-radius:8px; padding:8px 12px; font-size:18px; cursor:pointer;
+  }
+  table.simple{ width:100%; border-collapse:collapse; font-size:12px; }
+  table.simple th{ text-align:left; color:var(--ink-dim); font-weight:600; padding:6px 4px; border-bottom:1px solid var(--card-border); font-size:10px; text-transform:uppercase;}
+  table.simple td{ padding:7px 4px; border-bottom:1px solid var(--card-border); }
+  .pulse{ animation: pulse 1.4s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.4} }
+</style>
+</head>
+<body>
+
+<div id="login" class="login-screen">
+  <h1>🧾 Caixa da Loja</h1>
+  <p>Selecione quem está usando o app</p>
+  <select id="login-select"></select>
+  <button class="primary" style="max-width:280px" onclick="doLogin()">Entrar</button>
+  <p style="font-size:11px; color:var(--ink-dim); margin-top:14px; max-width:280px; text-align:center;">Não encontrou seu nome? Peça ao supervisor para te cadastrar em Config.</p>
+</div>
+
+<div id="app" style="display:none;">
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1 id="header-title">Caixa da Loja</h1>
+      <div class="sub" id="header-sub">—</div>
+    </div>
+    <button class="user-pill" onclick="logout()" style="cursor:pointer; border:1px solid var(--card-border); background:var(--card);">👤 <span id="current-user-label"></span> · trocar</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- VENDA -->
+  <div class="view" id="view-venda">
+    <div class="card">
+      <h2>Nova venda</h2>
+      <label>Categoria</label>
+      <select id="venda-categoria">
+        <option>Sapatos</option>
+        <option>Semijoias</option>
+        <option>Roupa Masculina</option>
+        <option>Roupa Feminina</option>
+        <option>Outros</option>
+      </select>
+      <label>Produto</label>
+      <input type="text" id="venda-produto" placeholder="Ex: Tênis branco 38">
+
+      <label>Forma(s) de pagamento</label>
+      <div class="pay-grid">
+        <div class="pay-field">
+          <div class="tag" style="color:var(--pix)"><span class="dot" style="background:var(--pix)"></span>PIX</div>
+          <input type="number" inputmode="decimal" id="pay-pix" placeholder="0,00" oninput="updateTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--credito)"><span class="dot" style="background:var(--credito)"></span>Crédito</div>
+          <input type="number" inputmode="decimal" id="pay-credito" placeholder="0,00" oninput="updateTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--debito)"><span class="dot" style="background:var(--debito)"></span>Débito</div>
+          <input type="number" inputmode="decimal" id="pay-debito" placeholder="0,00" oninput="updateTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--dinheiro)"><span class="dot" style="background:var(--dinheiro)"></span>Dinheiro</div>
+          <input type="number" inputmode="decimal" id="pay-dinheiro" placeholder="0,00" oninput="updateTotal()">
+        </div>
+        <div class="pay-field" style="grid-column:1/-1;">
+          <div class="tag" style="color:var(--crediario)"><span class="dot" style="background:var(--crediario)"></span>Crediário</div>
+          <input type="number" inputmode="decimal" id="pay-crediario" placeholder="0,00" oninput="updateTotal()">
+        </div>
+      </div>
+
+      <div class="total-line">
+        <div class="label">Total da venda</div>
+        <div class="value" id="venda-total">R$ 0,00</div>
+      </div>
+      <button class="primary" onclick="salvarVenda()">✓ Registrar venda</button>
+    </div>
+
+    <div class="card">
+      <h2>Últimas vendas de hoje</h2>
+      <div id="vendas-hoje-list"></div>
+    </div>
+  </div>
+
+  <!-- PAINEL VENDEDORA -->
+  <div class="view" id="view-painel">
+    <div class="card">
+      <h2 id="painel-saudacao">Meu painel</h2>
+      <div class="grid2">
+        <div class="stat"><div class="label">Vendido hoje</div><div class="value" id="p-hoje">R$ 0</div></div>
+        <div class="stat"><div class="label">Vendido no mês</div><div class="value" id="p-mes">R$ 0</div></div>
+        <div class="stat full">
+          <div class="label">Meta do mês — <span id="p-pct">0%</span></div>
+          <div class="bar-wrap"><div class="bar-fill" id="p-bar" style="width:0%"></div></div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:var(--ink-dim)">
+            <span id="p-meta-txt">Meta: R$ 0</span>
+            <span id="p-falta-txt">Falta: R$ 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Minhas vendas de hoje</h2>
+      <div id="minhas-vendas-list"></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="view" id="view-fechamento">
+    <div class="card">
+      <h2>Fechamento de caixa — hoje</h2>
+      <table class="simple">
+        <tr><th>Forma</th><th>Sistema</th><th>Na gaveta</th><th>Dif.</th></tr>
+        <tr><td>💵 Dinheiro</td><td id="fc-sis-dinheiro">R$ 0</td><td><input type="number" id="fc-real-dinheiro" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-dinheiro">—</td></tr>
+        <tr><td>📱 PIX</td><td id="fc-sis-pix">R$ 0</td><td><input type="number" id="fc-real-pix" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-pix">—</td></tr>
+        <tr><td>💳 Crédito</td><td id="fc-sis-credito">R$ 0</td><td><input type="number" id="fc-real-credito" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-credito">—</td></tr>
+        <tr><td>💳 Débito</td><td id="fc-sis-debito">R$ 0</td><td><input type="number" id="fc-real-debito" oninput="calcFechamento()" placeholder="0,00" style="width:90px; padding:6px; font-size:13px;"></td><td id="fc-dif-debito">—</td></tr>
+      </table>
+      <div class="total-line">
+        <div class="label">Diferença total</div>
+        <div class="value" id="fc-dif-total" style="color:var(--ink)">R$ 0,00</div>
+      </div>
+      <button class="primary" onclick="salvarFechamento()">✓ Confirmar fechamento</button>
+      <div id="fc-status" style="margin-top:10px; font-size:12px; color:var(--ink-dim)"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view" id="view-dashboard">
+    <div class="card month-select">
+      <div class="row-flex">
+        <button class="icon-btn" onclick="changeMonth(-1)">←</button>
+        <select id="dash-month" style="flex:1;" onchange="renderDashboard()"></select>
+        <button class="icon-btn" onclick="changeMonth(1)">→</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Resumo do mês</h2>
+      <div class="grid2">
+        <div class="stat"><div class="label">Total vendido</div><div class="value" id="d-total">R$ 0</div></div>
+        <div class="stat"><div class="label">Nº de vendas</div><div class="value" id="d-qtd">0</div></div>
+        <div class="stat"><div class="label">Ticket médio</div><div class="value" id="d-ticket">R$ 0</div></div>
+        <div class="stat"><div class="label">Crediário em aberto</div><div class="value" id="d-aberto">R$ 0</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Por forma de pagamento</h2>
+      <div id="d-formas"></div>
+    </div>
+    <div class="card">
+      <h2>Por categoria</h2>
+      <div id="d-categorias"></div>
+    </div>
+    <div class="card">
+      <h2>Ranking de vendedoras</h2>
+      <div id="d-ranking"></div>
+    </div>
+    <div class="card">
+      <h2>Fechamentos de caixa do mês</h2>
+      <div id="d-fechamentos"></div>
+    </div>
+  </div>
+
+  <!-- CREDIARIO -->
+  <div class="view" id="view-crediario">
+    <div class="card">
+      <h2>Registrar recebimento</h2>
+      <label>Cliente</label>
+      <input type="text" id="cred-cliente" placeholder="Nome do cliente">
+      <label>Vendedora responsável</label>
+      <select id="cred-vendedora"></select>
+      <label>Valor recebido</label>
+      <input type="number" id="cred-valor" placeholder="0,00">
+      <label>Forma</label>
+      <select id="cred-forma">
+        <option>PIX</option><option>Crédito</option><option>Débito</option><option>Dinheiro</option>
+      </select>
+      <button class="primary" onclick="salvarRecebimento()">✓ Registrar recebimento</button>
+    </div>
+    <div class="card">
+      <h2>Em aberto (todo histórico)</h2>
+      <div class="grid2" style="margin-bottom:14px;">
+        <div class="stat"><div class="label">Vendido no crediário</div><div class="value" id="cred-total-vendido">R$ 0</div></div>
+        <div class="stat"><div class="label">Em aberto</div><div class="value" id="cred-total-aberto">R$ 0</div></div>
+      </div>
+      <h2>Últimos recebimentos</h2>
+      <div id="cred-list"></div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="view" id="view-config">
+    <div class="card">
+      <h2>Vendedoras e metas</h2>
+      <div id="config-vendedoras-list"></div>
+      <label>Nova vendedora</label>
+      <input type="text" id="cfg-novo-nome" placeholder="Nome">
+      <label>Meta mensal (R$)</label>
+      <input type="number" id="cfg-novo-meta" placeholder="0,00">
+      <button class="primary" onclick="cfgAddVendor()">+ Adicionar vendedora</button>
+    </div>
+    <div class="card">
+      <h2>Comissão</h2>
+      <label>% abaixo da meta</label>
+      <input type="number" step="0.1" id="cfg-com-baixo">
+      <label>% atingindo a meta</label>
+      <input type="number" step="0.1" id="cfg-com-alto">
+      <button class="primary" onclick="cfgSaveComissao()">Salvar comissão</button>
+    </div>
+    <div class="card">
+      <h2>Backup</h2>
+      <p style="font-size:12px; color:var(--ink-dim); margin-top:0;">Os dados ficam salvos na nuvem deste app, mas faça backup local de vez em quando por segurança.</p>
+      <button class="secondary" onclick="exportBackup()">⬇ Exportar backup (.json)</button>
+    </div>
+    <div class="card">
+      <button class="secondary" onclick="logout()">Sair / Trocar usuário</button>
+    </div>
+  </div>
+
+</main>
+
+<nav class="bottom" id="bottom-nav"></nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================== FIREBASE ====================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBRigA8-7ajmZYTcTJzFidKCd3jQ5Wip_A",
+  authDomain: "caixa-loja-2e241.firebaseapp.com",
+  databaseURL: "https://caixa-loja-2e241-default-rtdb.firebaseio.com",
+  projectId: "caixa-loja-2e241",
+  storageBucket: "caixa-loja-2e241.firebasestorage.app",
+  messagingSenderId: "943640884811",
+  appId: "1:943640884811:web:8cdf85f31154828942ffce"
+};
+firebase.initializeApp(firebaseConfig);
+const dbRef = firebase.database().ref('loja-db');
+
+let dbLoadedOnce = false;
+
+/* ====================== ESTADO ====================== */
+let DB = { vendedoras: [], vendas: [], recebimentos: [], fechamentos: [], comissao: { baixo: 1, alto: 2 } };
+let currentUser = null; // {nome, isSupervisor}
+let currentMonth = new Date().toISOString().slice(0,7); // YYYY-MM
+
+const SUPERVISOR_NAME = "Supervisor(a)";
+
+function ensureDBShape(){
+  if(!DB.vendedoras) DB.vendedoras = [];
+  if(!DB.vendas) DB.vendas = [];
+  if(!DB.recebimentos) DB.recebimentos = [];
+  if(!DB.fechamentos) DB.fechamentos = [];
+  if(!DB.comissao) DB.comissao = { baixo: 1, alto: 2 };
+}
+
+function loadDB(){
+  // Resolve na primeira leitura; depois fica escutando mudanças em tempo real.
+  return new Promise((resolve)=>{
+    dbRef.on('value', (snap)=>{
+      const val = snap.val();
+      if(val) DB = val;
+      ensureDBShape();
+      if(!dbLoadedOnce){ dbLoadedOnce = true; resolve(); }
+      else { onRemoteUpdate(); }
+    }, (err)=>{
+      console.error(err);
+      ensureDBShape();
+      if(!dbLoadedOnce){ dbLoadedOnce = true; resolve(); }
+    });
+  });
+}
+async function saveDB(){
+  try{
+    await dbRef.set(DB);
+  }catch(e){ showToast('Erro ao salvar — verifique sua internet'); }
+}
+// Quando outro dispositivo altera os dados, atualiza a tela atual sem perder o que o usuário está digitando nos formulários.
+function onRemoteUpdate(){
+  if(!currentUser) { populateLogin(); return; }
+  const activeView = document.querySelector('.view.active');
+  if(!activeView) return;
+  const id = activeView.id.replace('view-','');
+  // Não re-renderiza a tela de "venda" pra não apagar o que a vendedora está digitando.
+  if(id === 'venda'){ renderVendaListOnly(); return; }
+  if(id === 'painel') renderPainel();
+  if(id === 'fechamento') { /* mantém os campos digitados */ }
+  if(id === 'dashboard') renderDashboard();
+  if(id === 'crediario') renderCrediarioListOnly();
+  if(id === 'config') renderConfig();
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function brl(n){ return 'R$ ' + (Number(n)||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ====================== LOGIN ====================== */
+function populateLogin(){
+  const sel = document.getElementById('login-select');
+  sel.innerHTML = '';
+  const opt0 = document.createElement('option');
+  opt0.value = SUPERVISOR_NAME; opt0.textContent = '👑 Supervisor(a) — ver tudo';
+  sel.appendChild(opt0);
+  DB.vendedoras.forEach(v=>{
+    const o = document.createElement('option');
+    o.value = v.nome; o.textContent = v.nome;
+    sel.appendChild(o);
+  });
+}
+function doLogin(){
+  const nome = document.getElementById('login-select').value;
+  currentUser = { nome, isSupervisor: nome === SUPERVISOR_NAME };
+  enterApp();
+}
+function logout(){
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  populateLogin();
+}
+
+/* ====================== NAV ====================== */
+const NAV_VENDEDORA = [
+  {id:'venda', icon:'🧾', label:'Lançar'},
+  {id:'painel', icon:'📈', label:'Meu painel'},
+  {id:'fechamento', icon:'🧮', label:'Fechamento'},
+];
+const NAV_SUPERVISOR = [
+  {id:'dashboard', icon:'📊', label:'Dashboard'},
+  {id:'venda', icon:'🧾', label:'Lançar'},
+  {id:'crediario', icon:'💰', label:'Crediário'},
+  {id:'config', icon:'⚙️', label:'Config'},
+];
+function buildNav(){
+  const nav = document.getElementById('bottom-nav');
+  const items = currentUser.isSupervisor ? NAV_SUPERVISOR : NAV_VENDEDORA;
+  nav.innerHTML = '';
+  items.forEach((it, i)=>{
+    const b = document.createElement('button');
+    b.innerHTML = `<span class="ic">${it.icon}</span><span>${it.label}</span>`;
+    b.onclick = ()=> switchView(it.id);
+    b.id = 'nav-'+it.id;
+    nav.appendChild(b);
+  });
+  switchView(items[0].id);
+}
+function switchView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  const navBtn = document.getElementById('nav-'+id);
+  if(navBtn) navBtn.classList.add('active');
+  if(id === 'venda') renderVendaView();
+  if(id === 'painel') renderPainel();
+  if(id === 'fechamento') renderFechamento();
+  if(id === 'dashboard') { populateMonthSelect(); renderDashboard(); }
+  if(id === 'crediario') renderCrediario();
+  if(id === 'config') renderConfig();
+}
+
+/* ====================== ENTRAR NO APP ====================== */
+function enterApp(){
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('current-user-label').textContent = currentUser.nome;
+  document.getElementById('header-title').textContent = currentUser.isSupervisor ? 'Dashboard da Loja' : 'Caixa da Loja';
+  document.getElementById('header-sub').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+  buildNav();
+}
+
+/* ====================== VENDA ====================== */
+function updateTotal(){
+  const total = ['pix','credito','debito','dinheiro','crediario'].reduce((s,k)=> s + (parseFloat(document.getElementById('pay-'+k).value)||0), 0);
+  document.getElementById('venda-total').textContent = brl(total);
+  return total;
+}
+async function salvarVenda(){
+  const categoria = document.getElementById('venda-categoria').value;
+  const produto = document.getElementById('venda-produto').value.trim();
+  const pix = parseFloat(document.getElementById('pay-pix').value)||0;
+  const credito = parseFloat(document.getElementById('pay-credito').value)||0;
+  const debito = parseFloat(document.getElementById('pay-debito').value)||0;
+  const dinheiro = parseFloat(document.getElementById('pay-dinheiro').value)||0;
+  const crediario = parseFloat(document.getElementById('pay-crediario').value)||0;
+  const total = pix+credito+debito+dinheiro+crediario;
+  if(total <= 0) return showToast('Informe ao menos um valor de pagamento');
+  if(!produto) return showToast('Informe o produto');
+
+  const vendedora = currentUser.isSupervisor ? (DB.vendedoras[0] ? DB.vendedoras[0].nome : 'Supervisor(a)') : currentUser.nome;
+
+  DB.vendas.push({
+    id: uid(), data: todayStr(), vendedora, categoria, produto,
+    pix, credito, debito, dinheiro, crediario, total
+  });
+  await saveDB();
+  ['pix','credito','debito','dinheiro','crediario'].forEach(k=> document.getElementById('pay-'+k).value = '');
+  document.getElementById('venda-produto').value = '';
+  updateTotal();
+  showToast('Venda registrada ✓');
+  renderVendaView();
+}
+function renderVendaView(){
+  updateTotal();
+  renderVendaListOnly();
+}
+function renderVendaListOnly(){
+  const list = document.getElementById('vendas-hoje-list');
+  const hoje = DB.vendas.filter(v=> v.data === todayStr()).slice().reverse();
+  if(hoje.length === 0){ list.innerHTML = '<div class="empty"><span class="ic">🗒️</span>Nenhuma venda registrada hoje ainda</div>'; return; }
+  list.innerHTML = hoje.map(v=> `
+    <div class="list-row">
+      <div><div class="l1">${v.produto || v.categoria}</div><div class="l2">${v.vendedora} · ${v.categoria}</div></div>
+      <div class="l1">${brl(v.total)}</div>
+    </div>`).join('');
+}
+
+/* ====================== PAINEL VENDEDORA ====================== */
+function renderPainel(){
+  const nome = currentUser.nome;
+  document.getElementById('painel-saudacao').textContent = 'Olá, ' + nome;
+  const hoje = DB.vendas.filter(v=> v.vendedora === nome && v.data === todayStr());
+  const mesAtual = todayStr().slice(0,7);
+  const doMes = DB.vendas.filter(v=> v.vendedora === nome && v.data.slice(0,7) === mesAtual);
+  const totalHoje = hoje.reduce((s,v)=>s+v.total,0);
+  const totalMes = doMes.reduce((s,v)=>s+v.total,0);
+  const vendedoraCfg = DB.vendedoras.find(x=>x.nome===nome) || {meta:0};
+  const meta = vendedoraCfg.meta || 0;
+  const pct = meta > 0 ? Math.min(100, (totalMes/meta)*100) : 0;
+  const falta = Math.max(0, meta - totalMes);
+
+  document.getElementById('p-hoje').textContent = brl(totalHoje);
+  document.getElementById('p-mes').textContent = brl(totalMes);
+  document.getElementById('p-pct').textContent = pct.toFixed(0)+'%';
+  document.getElementById('p-bar').style.width = pct+'%';
+  document.getElementById('p-meta-txt').textContent = 'Meta: ' + brl(meta);
+  document.getElementById('p-falta-txt').textContent = falta>0 ? ('Falta: '+brl(falta)) : 'Meta batida! 🎉';
+
+  const list = document.getElementById('minhas-vendas-list');
+  if(hoje.length===0){ list.innerHTML = '<div class="empty"><span class="ic">🗒️</span>Você ainda não lançou vendas hoje</div>'; return; }
+  list.innerHTML = hoje.slice().reverse().map(v=> `
+    <div class="list-row">
+      <div><div class="l1">${v.produto || v.categoria}</div><div class="l2">${v.categoria}</div></div>
+      <div class="l1">${brl(v.total)}</div>
+    </div>`).join('');
+}
+
+/* ====================== FECHAMENTO DE CAIXA ====================== */
+function fechamentoSistema(){
+  const responsavel = currentUser.isSupervisor ? null : currentUser.nome;
+  const hoje = DB.vendas.filter(v=> v.data === todayStr() && (responsavel ? v.vendedora===responsavel : true));
+  return {
+    dinheiro: hoje.reduce((s,v)=>s+v.dinheiro,0),
+    pix: hoje.reduce((s,v)=>s+v.pix,0),
+    credito: hoje.reduce((s,v)=>s+v.credito,0),
+    debito: hoje.reduce((s,v)=>s+v.debito,0),
+  };
+}
+function renderFechamento(){
+  const sis = fechamentoSistema();
+  document.getElementById('fc-sis-dinheiro').textContent = brl(sis.dinheiro);
+  document.getElementById('fc-sis-pix').textContent = brl(sis.pix);
+  document.getElementById('fc-sis-credito').textContent = brl(sis.credito);
+  document.getElementById('fc-sis-debito').textContent = brl(sis.debito);
+  ['dinheiro','pix','credito','debito'].forEach(k=> document.getElementById('fc-real-'+k).value = '');
+  document.getElementById('fc-dif-total').textContent = brl(0);
+  document.getElementById('fc-status').textContent = '';
+  calcFechamento();
+}
+function calcFechamento(){
+  const sis = fechamentoSistema();
+  let totalDif = 0;
+  ['dinheiro','pix','credito','debito'].forEach(k=>{
+    const real = parseFloat(document.getElementById('fc-real-'+k).value);
+    const cell = document.getElementById('fc-dif-'+k);
+    if(isNaN(real)){ cell.textContent='—'; cell.style.color='var(--ink-dim)'; return; }
+    const dif = real - sis[k];
+    totalDif += dif;
+    cell.textContent = (dif>=0?'+':'') + brl(dif);
+    cell.style.color = Math.abs(dif) < 0.01 ? 'var(--green)' : 'var(--red)';
+  });
+  const tot = document.getElementById('fc-dif-total');
+  tot.textContent = (totalDif>=0?'+':'') + brl(totalDif);
+  tot.style.color = Math.abs(totalDif) < 0.01 ? 'var(--green)' : 'var(--red)';
+}
+async function salvarFechamento(){
+  const sis = fechamentoSistema();
+  const real = {};
+  let algumPreenchido = false;
+  ['dinheiro','pix','credito','debito'].forEach(k=>{
+    const v = parseFloat(document.getElementById('fc-real-'+k).value);
+    real[k] = isNaN(v) ? null : v;
+    if(!isNaN(v)) algumPreenchido = true;
+  });
+  if(!algumPreenchido) return showToast('Preencha ao menos um valor conferido');
+  const responsavel = currentUser.isSupervisor ? 'Supervisor(a)' : currentUser.nome;
+  DB.fechamentos = DB.fechamentos.filter(f=> !(f.data===todayStr() && f.responsavel===responsavel));
+  DB.fechamentos.push({ id: uid(), data: todayStr(), responsavel, sistema: sis, real });
+  await saveDB();
+  document.getElementById('fc-status').textContent = '✓ Fechamento salvo às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  showToast('Fechamento confirmado');
+}
+
+/* ====================== DASHBOARD (SUPERVISOR) ====================== */
+function populateMonthSelect(){
+  const sel = document.getElementById('dash-month');
+  const months = new Set(DB.vendas.map(v=>v.data.slice(0,7)));
+  months.add(currentMonth);
+  const sorted = Array.from(months).sort();
+  sel.innerHTML = sorted.map(m=>{
+    const [y,mo] = m.split('-');
+    const label = new Date(y, mo-1, 1).toLocaleDateString('pt-BR',{month:'long', year:'numeric'});
+    return `<option value="${m}" ${m===currentMonth?'selected':''}>${label}</option>`;
+  }).join('');
+}
+function changeMonth(delta){
+  const [y,m] = currentMonth.split('-').map(Number);
+  const d = new Date(y, m-1+delta, 1);
+  currentMonth = d.toISOString().slice(0,7);
+  populateMonthSelect();
+  renderDashboard();
+}
+function renderDashboard(){
+  currentMonth = document.getElementById('dash-month').value || currentMonth;
+  const vendasMes = DB.vendas.filter(v=> v.data.slice(0,7) === currentMonth);
+  const total = vendasMes.reduce((s,v)=>s+v.total,0);
+  const qtd = vendasMes.length;
+  const ticket = qtd>0 ? total/qtd : 0;
+  const crediarioVendido = vendasMes.reduce((s,v)=>s+v.crediario,0);
+  const recebMes = DB.recebimentos.filter(r=>r.data.slice(0,7)===currentMonth).reduce((s,r)=>s+r.valor,0);
+  const aberto = DB.vendas.reduce((s,v)=>s+v.crediario,0) - DB.recebimentos.reduce((s,r)=>s+r.valor,0);
+
+  document.getElementById('d-total').textContent = brl(total);
+  document.getElementById('d-qtd').textContent = qtd;
+  document.getElementById('d-ticket').textContent = brl(ticket);
+  document.getElementById('d-aberto').textContent = brl(Math.max(0,aberto));
+
+  const formas = [
+    {k:'pix', label:'PIX', color:'var(--pix)'},
+    {k:'credito', label:'Crédito', color:'var(--credito)'},
+    {k:'debito', label:'Débito', color:'var(--debito)'},
+    {k:'dinheiro', label:'Dinheiro', color:'var(--dinheiro)'},
+    {k:'crediario', label:'Crediário', color:'var(--crediario)'},
+  ];
+  document.getElementById('d-formas').innerHTML = formas.map(f=>{
+    const v = vendasMes.reduce((s,x)=>s+x[f.k],0);
+    const pct = total>0 ? (v/total*100) : 0;
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+        <span style="color:${f.color}">${f.label}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%; background:${f.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  const cats = {};
+  vendasMes.forEach(v=> cats[v.categoria] = (cats[v.categoria]||0) + v.total);
+  const catArr = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('d-categorias').innerHTML = catArr.length ? catArr.map(([cat,v])=>{
+    const pct = total>0 ? (v/total*100):0;
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+        <span>${cat}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('') : '<div class="empty">Sem vendas neste mês</div>';
+
+  const rank = {};
+  vendasMes.forEach(v=> { rank[v.vendedora] = rank[v.vendedora] || {total:0,qtd:0}; rank[v.vendedora].total += v.total; rank[v.vendedora].qtd += 1; });
+  const rankArr = Object.entries(rank).sort((a,b)=>b[1].total-a[1].total);
+  document.getElementById('d-ranking').innerHTML = rankArr.length ? rankArr.map(([nome,d],i)=>{
+    const cfg = DB.vendedoras.find(x=>x.nome===nome);
+    const meta = cfg ? cfg.meta : 0;
+    const bateu = meta>0 && d.total >= meta;
+    return `<div class="list-row">
+      <div><div class="l1">${i+1}º ${nome}</div><div class="l2">${d.qtd} vendas · meta ${brl(meta)}</div></div>
+      <div style="text-align:right;">
+        <div class="l1">${brl(d.total)}</div>
+        ${meta>0 ? `<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">Sem vendas neste mês</div>';
+
+  const fechMes = DB.fechamentos.filter(f=>f.data.slice(0,7)===currentMonth).sort((a,b)=>b.data.localeCompare(a.data));
+  document.getElementById('d-fechamentos').innerHTML = fechMes.length ? fechMes.map(f=>{
+    let dif = 0;
+    ['dinheiro','pix','credito','debito'].forEach(k=>{ if(f.real[k]!==null) dif += (f.real[k]-f.sistema[k]); });
+    const ok = Math.abs(dif) < 0.01;
+    return `<div class="list-row">
+      <div><div class="l1">${new Date(f.data+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div><div class="l2">${f.responsavel}</div></div>
+      <span class="badge ${ok?'ok':'low'}">${ok?'sem diferença':((dif>=0?'+':'')+brl(dif))}</span>
+    </div>`;
+  }).join('') : '<div class="empty">Nenhum fechamento registrado neste mês</div>';
+}
+
+/* ====================== CREDIÁRIO ====================== */
+function renderCrediario(){
+  const sel = document.getElementById('cred-vendedora');
+  sel.innerHTML = DB.vendedoras.map(v=>`<option>${v.nome}</option>`).join('');
+  renderCrediarioListOnly();
+}
+function renderCrediarioListOnly(){
+  const totalVendido = DB.vendas.reduce((s,v)=>s+v.crediario,0);
+  const totalRecebido = DB.recebimentos.reduce((s,r)=>s+r.valor,0);
+  document.getElementById('cred-total-vendido').textContent = brl(totalVendido);
+  document.getElementById('cred-total-aberto').textContent = brl(Math.max(0,totalVendido-totalRecebido));
+  const list = document.getElementById('cred-list');
+  const recent = DB.recebimentos.slice().reverse().slice(0,15);
+  list.innerHTML = recent.length ? recent.map(r=>`
+    <div class="list-row">
+      <div><div class="l1">${r.cliente}</div><div class="l2">${r.vendedora} · ${r.forma} · ${new Date(r.data+'T12:00').toLocaleDateString('pt-BR')}</div></div>
+      <div class="l1">${brl(r.valor)}</div>
+    </div>`).join('') : '<div class="empty">Nenhum recebimento ainda</div>';
+}
+async function salvarRecebimento(){
+  const cliente = document.getElementById('cred-cliente').value.trim();
+  const vendedora = document.getElementById('cred-vendedora').value;
+  const valor = parseFloat(document.getElementById('cred-valor').value)||0;
+  const forma = document.getElementById('cred-forma').value;
+  if(!cliente) return showToast('Informe o cliente');
+  if(valor<=0) return showToast('Informe o valor');
+  DB.recebimentos.push({id:uid(), data:todayStr(), cliente, vendedora, valor, forma});
+  await saveDB();
+  document.getElementById('cred-cliente').value='';
+  document.getElementById('cred-valor').value='';
+  showToast('Recebimento registrado');
+  renderCrediario();
+}
+
+/* ====================== CONFIG ====================== */
+function renderConfig(){
+  document.getElementById('config-vendedoras-list').innerHTML = DB.vendedoras.map(v=>`
+    <div class="list-row">
+      <div><div class="l1">${v.nome}</div><div class="l2">Meta: ${brl(v.meta)}</div></div>
+      <button class="icon-btn" onclick="cfgRemoveVendor('${v.id}')">🗑️</button>
+    </div>`).join('') || '<div class="empty">Nenhuma vendedora cadastrada</div>';
+  document.getElementById('cfg-com-baixo').value = DB.comissao.baixo;
+  document.getElementById('cfg-com-alto').value = DB.comissao.alto;
+}
+async function cfgAddVendor(){
+  const nome = document.getElementById('cfg-novo-nome').value.trim();
+  const meta = parseFloat(document.getElementById('cfg-novo-meta').value)||0;
+  if(!nome) return showToast('Digite um nome');
+  DB.vendedoras.push({id:uid(), nome, meta});
+  await saveDB();
+  document.getElementById('cfg-novo-nome').value='';
+  document.getElementById('cfg-novo-meta').value='';
+  renderConfig();
+  showToast('Vendedora adicionada');
+}
+async function cfgRemoveVendor(id){
+  DB.vendedoras = DB.vendedoras.filter(v=>v.id!==id);
+  await saveDB();
+  renderConfig();
+}
+async function cfgSaveComissao(){
+  DB.comissao.baixo = parseFloat(document.getElementById('cfg-com-baixo').value)||0;
+  DB.comissao.alto = parseFloat(document.getElementById('cfg-com-alto').value)||0;
+  await saveDB();
+  showToast('Comissão atualizada');
+}
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'backup-caixa-loja-'+todayStr()+'.json';
+  a.click();
+}
+
+/* ====================== INIT ====================== */
+(async function init(){
+  await loadDB();
+  populateLogin();
+  // Em PC compartilhado, sempre pede pra escolher quem está usando — não mantém sessão salva.
+})();
+</script>
+</body>
+</html>
