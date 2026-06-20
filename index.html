@@ -242,6 +242,15 @@
       </div>
     </div>
     <div class="card">
+      <h2>💰 Comissão estimada do mês</h2>
+      <div class="grid2">
+        <div class="stat"><div class="label">% aplicado</div><div class="value" id="p-comissao-pct">0%</div></div>
+        <div class="stat"><div class="label">Comissão</div><div class="value" id="p-comissao-valor" style="color:var(--accent)">R$ 0</div></div>
+        <div class="stat full"><div class="label">Ticket médio do mês</div><div class="value" id="p-ticket-medio">R$ 0</div></div>
+      </div>
+      <p style="font-size:11px; color:var(--ink-dim); margin:10px 0 0;">Atinja a meta para subir o % de comissão sobre o total vendido no mês.</p>
+    </div>
+    <div class="card">
       <h2>Minhas vendas de hoje</h2>
       <div id="minhas-vendas-list"></div>
     </div>
@@ -584,6 +593,14 @@ function renderPainel(){
   document.getElementById('p-meta-txt').textContent = 'Meta: ' + brl(meta);
   document.getElementById('p-falta-txt').textContent = falta>0 ? ('Falta: '+brl(falta)) : 'Meta batida! 🎉';
 
+  const bateuMeta = meta > 0 && totalMes >= meta;
+  const pctComissao = bateuMeta ? (DB.comissao.alto||0) : (DB.comissao.baixo||0);
+  const comissao = totalMes * (pctComissao/100);
+  const ticketMedio = doMes.length>0 ? totalMes/doMes.length : 0;
+  document.getElementById('p-comissao-pct').textContent = pctComissao + '%';
+  document.getElementById('p-comissao-valor').textContent = brl(comissao);
+  document.getElementById('p-ticket-medio').textContent = brl(ticketMedio);
+
   const list = document.getElementById('minhas-vendas-list');
   if(hoje.length===0){ list.innerHTML = '<div class="empty"><span class="ic">🗒️</span>Você ainda não lançou vendas hoje</div>'; return; }
   list.innerHTML = hoje.slice().reverse().map(v=> `
@@ -721,11 +738,20 @@ function renderDashboard(){
     const cfg = DB.vendedoras.find(x=>x.nome===nome);
     const meta = cfg ? cfg.meta : 0;
     const bateu = meta>0 && d.total >= meta;
-    return `<div class="list-row">
-      <div><div class="l1">${i+1}º ${nome}</div><div class="l2">${d.qtd} vendas · meta ${brl(meta)}</div></div>
-      <div style="text-align:right;">
-        <div class="l1">${brl(d.total)}</div>
-        ${meta>0 ? `<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>` : ''}
+    const ticketMedio = d.qtd>0 ? d.total/d.qtd : 0;
+    const pctComissao = bateu ? (DB.comissao.alto||0) : (DB.comissao.baixo||0);
+    const comissao = d.total * (pctComissao/100);
+    return `<div class="list-row" style="flex-direction:column; align-items:stretch;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div><div class="l1">${i+1}º ${nome}</div><div class="l2">${d.qtd} vendas · meta ${brl(meta)}</div></div>
+        <div style="text-align:right;">
+          <div class="l1">${brl(d.total)}</div>
+          ${meta>0 ? `<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px dashed var(--card-border); font-size:11px; color:var(--ink-dim);">
+        <span>Ticket médio: <b style="color:var(--ink)">${brl(ticketMedio)}</b></span>
+        <span>Comissão (${pctComissao}%): <b style="color:var(--accent)">${brl(comissao)}</b></span>
       </div>
     </div>`;
   }).join('') : '<div class="empty">Sem vendas neste mês</div>';
