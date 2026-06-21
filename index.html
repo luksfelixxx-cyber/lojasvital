@@ -102,6 +102,34 @@
   .tabbar button{ flex:1; min-width:80px; padding:9px; border-radius:8px; border:1px solid var(--card-border); background:var(--bg-soft); color:var(--ink-dim); font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font-body); }
   .tabbar button.active{ background:var(--accent); color:#2A1605; border-color:var(--accent); }
   .subview{ display:none; } .subview.active{ display:block; }
+
+  /* ====================== DESKTOP / TELA LARGA ====================== */
+  @media (min-width: 860px){
+    body{ padding-bottom: 30px; }
+    main{ max-width: 1280px; padding: 24px 28px; }
+    .brand{ max-width: 1280px; margin: 0 auto; }
+    .view.active{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .view.active .card{ margin-bottom: 0; }
+    /* telas com só 1 card (ex: detalhe de cliente) ocupam a largura toda */
+    .view.active .card:only-child{ grid-column: 1 / -1; }
+    .pay-grid{ grid-template-columns: repeat(4, 1fr); }
+    .grid3{ grid-template-columns: repeat(3, 1fr); }
+    nav.bottom{
+      max-width: 1280px; left:50%; transform:translateX(-50%);
+      border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+    }
+    nav.bottom button{ font-size:12px; padding:12px 8px; }
+    nav.bottom button .ic{ font-size:20px; }
+    .toast{ left:50%; }
+  }
+  @media (min-width: 1200px){
+    .pay-grid{ grid-template-columns: repeat(4, 1fr); }
+  }
 </style>
 </head>
 <body>
