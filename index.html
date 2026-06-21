@@ -116,6 +116,7 @@
       </div>
     </div>
     <select class="vendedora-pill vendedora-select" id="vendedora-ativa" onchange="setActiveVendedora(this.value)"></select>
+    <button class="icon-btn" style="margin-left:6px;" onclick="switchView('config')">⚙️</button>
   </div>
 </header>
 
@@ -414,10 +415,11 @@
   <!-- CONFIG -->
   <div class="view" id="view-config">
     <div class="card">
-      <h2>Vendedoras e metas</h2>
+      <h2>👤 Vendedoras</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Edite a meta mensal direto no campo ao lado do nome (salva sozinho). Toque no 🗑️ para excluir.</p>
       <div id="config-vendedoras-list"></div>
-      <label>Nova vendedora</label>
-      <input type="text" id="cfg-novo-nome" placeholder="Nome">
+      <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border);">+ Cadastrar nova vendedora</label>
+      <input type="text" id="cfg-novo-nome" placeholder="Nome da vendedora">
       <label>Meta mensal (R$)</label>
       <input type="number" id="cfg-novo-meta" placeholder="0,00">
       <button class="primary" onclick="cfgAddVendor()">+ Adicionar vendedora</button>
@@ -566,11 +568,11 @@ function startOfWeek(d){ const dt=new Date(d); const day=dt.getDay(); const diff
 /* ====================== VENDEDORA ATIVA (sem login) ====================== */
 function populateVendedoraSelect(){
   const selects = document.querySelectorAll('.vendedora-select');
-  const optionsHtml = DB.vendedoras.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('') + `<option value="__loja__">🏪 Loja / Dono(a)</option>`;
+  const optionsHtml = DB.vendedoras.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('');
   selects.forEach(sel=> sel.innerHTML = optionsHtml);
-  if(DB.vendedoras.some(v=>v.nome===activeVendedora) || activeVendedora==='__loja__'){ /* mantém */ }
+  if(DB.vendedoras.some(v=>v.nome===activeVendedora)){ /* mantém */ }
   else if(DB.vendedoras.length>0){ activeVendedora = DB.vendedoras[0].nome; }
-  else { activeVendedora = '__loja__'; }
+  else { activeVendedora = null; }
   selects.forEach(sel=> sel.value = activeVendedora);
 }
 function setActiveVendedora(val){
@@ -689,7 +691,7 @@ async function salvarVenda(){
   const total = pix+credito+debito+dinheiro;
   if(total<=0) return showToast('Informe ao menos um valor de pagamento');
 
-  const vendedora = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
+  const vendedora = activeVendedora;
   const clienteNomeInput = document.getElementById('venda-cliente-nome').value.trim();
   const clienteTelefone = document.getElementById('venda-cliente-telefone').value.trim();
   const clienteEndereco = document.getElementById('venda-cliente-endereco').value.trim();
@@ -813,7 +815,7 @@ async function salvarCrediario(){
   if(!nome) return showToast('Informe o nome do cliente');
   if(!telefone) return showToast('Informe o telefone do cliente');
 
-  const vendedora = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
+  const vendedora = activeVendedora;
   const dataVenda = todayStr();
   const valor = cartCred.reduce((s,i)=>s+i.valor,0);
   const categoria = cartCred[0].categoria;
@@ -1050,7 +1052,7 @@ function diasUteisPonderados(ano, mes){
 
 /* ====================== PAINEL VENDEDORA ====================== */
 function renderPainel(){
-  const nome = activeVendedora==='__loja__' ? null : activeVendedora;
+  const nome = activeVendedora;
   document.getElementById('painel-saudacao').textContent = nome ? ('Olá, '+nome) : 'Painel geral da loja';
   const filtro = v=> nome ? v.vendedora===nome : true;
   const hoje = DB.vendas.filter(v=> filtro(v) && v.data===todayStr());
@@ -1106,7 +1108,7 @@ async function salvarAbertura(){
 
 /* ====================== FECHAMENTO ====================== */
 function fechamentoSistema(){
-  const nome = activeVendedora==='__loja__' ? null : activeVendedora;
+  const nome = activeVendedora;
   const hoje = DB.vendas.filter(v=> v.data===todayStr() && (nome ? v.vendedora===nome : true));
   const retiradasHoje = (DB.retiradas||[]).filter(r=>r.data===todayStr()).reduce((s,r)=>s+r.valor,0);
   return {
@@ -1149,7 +1151,7 @@ async function salvarFechamento(){
   const real = {}; let algumPreenchido=false;
   ['dinheiro','pix','credito','debito'].forEach(k=>{ const v=parseFloat(document.getElementById('fc-real-'+k).value); real[k]=isNaN(v)?null:v; if(!isNaN(v)) algumPreenchido=true; });
   if(!algumPreenchido) return showToast('Preencha ao menos um valor conferido');
-  const responsavel = activeVendedora==='__loja__' ? 'Loja' : activeVendedora;
+  const responsavel = activeVendedora;
   DB.fechamentos = DB.fechamentos.filter(f=> !(f.data===todayStr() && f.responsavel===responsavel));
   DB.fechamentos.push({id:uid(), data:todayStr(), responsavel, sistema:sis, real});
   await saveDB();
