@@ -115,7 +115,7 @@
         <div class="sub"><span class="offline-dot" id="offline-dot"></span><span id="header-sub">—</span></div>
       </div>
     </div>
-    <select class="vendedora-pill" id="vendedora-ativa" onchange="setActiveVendedora()"></select>
+    <select class="vendedora-pill vendedora-select" id="vendedora-ativa" onchange="setActiveVendedora(this.value)"></select>
   </div>
 </header>
 
@@ -125,6 +125,8 @@
   <div class="view" id="view-venda">
     <div class="card">
       <h2>Nova venda</h2>
+      <label>Vendedora responsável</label>
+      <select class="vendedora-select" id="vendedora-select-venda" onchange="setActiveVendedora(this.value)"></select>
 
       <label>Cliente (opcional)</label>
       <input type="text" id="venda-cliente-nome" list="clientes-datalist" placeholder="Nome do cliente" oninput="autocompleteCliente('venda')">
@@ -192,6 +194,8 @@
   <div class="view" id="view-crediario">
     <div class="card">
       <h2>🤝 Nova venda crediário</h2>
+      <label>Vendedora responsável</label>
+      <select class="vendedora-select" id="vendedora-select-cred" onchange="setActiveVendedora(this.value)"></select>
       <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Os dados do cliente facilitam o contato depois.</p>
 
       <label>Cliente</label>
@@ -319,6 +323,7 @@
         <div class="stat full">
           <div class="label">Meta do dia — <span id="p-pct-dia">0%</span></div>
           <div class="bar-wrap"><div class="bar-fill" id="p-bar-dia" style="width:0%"></div></div>
+          <div style="font-size:11px; color:var(--ink-dim); margin-top:6px;" id="p-meta-dia-txt"></div>
         </div>
         <div class="stat full">
           <div class="label">Meta do mês — <span id="p-pct">0%</span></div>
@@ -426,6 +431,13 @@
       <button class="primary" onclick="cfgSaveComissao()">Salvar comissão</button>
     </div>
     <div class="card">
+      <h2>Meta de ticket médio</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Usada no Dashboard para mostrar se cada vendedora está acima ou abaixo do ticket médio ideal.</p>
+      <label>Ticket médio alvo (R$)</label>
+      <input type="number" id="cfg-ticket-meta" placeholder="0,00">
+      <button class="primary" onclick="cfgSaveTicketMeta()">Salvar meta de ticket médio</button>
+    </div>
+    <div class="card">
       <h2>Backup</h2>
       <p style="font-size:12px; color:var(--ink-dim); margin-top:0;">Os dados ficam salvos na nuvem (Firebase) e também em cache neste aparelho para uso offline.</p>
       <button class="secondary" onclick="exportBackup()">⬇ Exportar backup (.json)</button>
@@ -487,6 +499,7 @@ function ensureDBShape(){
   if(!DB.retiradas) DB.retiradas=[];
   if(!DB.aberturas) DB.aberturas={};
   if(!DB.comissao) DB.comissao={baixo:1, alto:2};
+  if(DB.metaTicketMedio===undefined) DB.metaTicketMedio = 0;
 }
 
 /* ====================== OFFLINE / CACHE LOCAL ====================== */
@@ -552,15 +565,18 @@ function startOfWeek(d){ const dt=new Date(d); const day=dt.getDay(); const diff
 
 /* ====================== VENDEDORA ATIVA (sem login) ====================== */
 function populateVendedoraSelect(){
-  const sel = document.getElementById('vendedora-ativa');
-  sel.innerHTML = DB.vendedoras.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('') + `<option value="__loja__">🏪 Loja / Dono(a)</option>`;
-  if(DB.vendedoras.some(v=>v.nome===activeVendedora) || activeVendedora==='__loja__'){ sel.value = activeVendedora; }
-  else if(DB.vendedoras.length>0){ activeVendedora = DB.vendedoras[0].nome; sel.value = activeVendedora; }
-  else { activeVendedora = '__loja__'; sel.value = '__loja__'; }
+  const selects = document.querySelectorAll('.vendedora-select');
+  const optionsHtml = DB.vendedoras.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('') + `<option value="__loja__">🏪 Loja / Dono(a)</option>`;
+  selects.forEach(sel=> sel.innerHTML = optionsHtml);
+  if(DB.vendedoras.some(v=>v.nome===activeVendedora) || activeVendedora==='__loja__'){ /* mantém */ }
+  else if(DB.vendedoras.length>0){ activeVendedora = DB.vendedoras[0].nome; }
+  else { activeVendedora = '__loja__'; }
+  selects.forEach(sel=> sel.value = activeVendedora);
 }
-function setActiveVendedora(){
-  activeVendedora = document.getElementById('vendedora-ativa').value;
+function setActiveVendedora(val){
+  activeVendedora = val !== undefined ? val : activeVendedora;
   localStorage.setItem('loja-vendedora-ativa', activeVendedora);
+  document.querySelectorAll('.vendedora-select').forEach(sel=> sel.value = activeVendedora);
   renderPainel();
 }
 
@@ -1020,6 +1036,18 @@ function renderConciliacao(){
     </div>`).join('') : '<div class="empty">Nenhum lançamento nessa forma neste mês</div>';
 }
 
+function diasUteisPonderados(ano, mes){
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+  let total = 0;
+  for(let d=1; d<=diasNoMes; d++){
+    const dow = new Date(ano, mes-1, d).getDay(); // 0=domingo, 6=sábado
+    if(dow===0) total += 0;
+    else if(dow===6) total += 0.5;
+    else total += 1;
+  }
+  return total || 1;
+}
+
 /* ====================== PAINEL VENDEDORA ====================== */
 function renderPainel(){
   const nome = activeVendedora==='__loja__' ? null : activeVendedora;
@@ -1034,8 +1062,8 @@ function renderPainel(){
   const meta = nome ? (cfg.meta||0) : DB.vendedoras.reduce((s,v)=>s+(v.meta||0),0);
   const pct = meta>0 ? Math.min(100,(totalMes/meta)*100) : 0;
   const falta = Math.max(0, meta-totalMes);
-  const diasNoMes = new Date(Number(mesAtual.slice(0,4)), Number(mesAtual.slice(5,7)), 0).getDate();
-  const metaDia = meta>0 ? meta/diasNoMes : 0;
+  const diasUteis = diasUteisPonderados(Number(mesAtual.slice(0,4)), Number(mesAtual.slice(5,7)));
+  const metaDia = meta>0 ? meta/diasUteis : 0;
   const pctDia = metaDia>0 ? Math.min(100, (totalHoje/metaDia)*100) : 0;
 
   document.getElementById('p-hoje').textContent = brl(totalHoje);
@@ -1044,6 +1072,7 @@ function renderPainel(){
   document.getElementById('p-bar').style.width = pct+'%';
   document.getElementById('p-pct-dia').textContent = pctDia.toFixed(0)+'%';
   document.getElementById('p-bar-dia').style.width = pctDia+'%';
+  document.getElementById('p-meta-dia-txt').textContent = metaDia>0 ? ('Meta de hoje: '+brl(metaDia)) : '';
   document.getElementById('p-meta-txt').textContent = 'Meta: '+brl(meta);
   document.getElementById('p-falta-txt').textContent = falta>0 ? ('Falta: '+brl(falta)) : 'Meta batida! 🎉';
 
@@ -1201,16 +1230,18 @@ function renderDashboard(){
 
   const rank = {}; vendasMes.forEach(v=>{ rank[v.vendedora]=rank[v.vendedora]||{total:0,qtd:0}; rank[v.vendedora].total+=v.total; rank[v.vendedora].qtd+=1; });
   const rankArr = Object.entries(rank).sort((a,b)=>b[1].total-a[1].total);
+  const metaTicket = DB.metaTicketMedio || 0;
   document.getElementById('d-ranking').innerHTML = rankArr.length ? rankArr.map(([nome,d],i)=>{
     const cfg = DB.vendedoras.find(x=>x.nome===nome); const meta = cfg?cfg.meta:0; const bateu = meta>0 && d.total>=meta;
     const ticketMedio = d.qtd>0?d.total/d.qtd:0; const pctComissao = bateu?(DB.comissao.alto||0):(DB.comissao.baixo||0); const comissao = d.total*(pctComissao/100);
+    const ticketBadge = metaTicket>0 ? `<span class="badge ${ticketMedio>=metaTicket?'ok':'low'}" style="margin-left:6px;">${ticketMedio>=metaTicket?'ticket ↑':'ticket ↓'}</span>` : '';
     return `<div class="list-row" style="flex-direction:column; align-items:stretch;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div><div class="l1">${i+1}º ${nome}</div><div class="l2">${d.qtd} vendas · meta ${brl(meta)}</div></div>
         <div style="text-align:right;"><div class="l1">${brl(d.total)}</div>${meta>0?`<span class="badge ${bateu?'ok':'low'}">${bateu?'meta batida':'abaixo da meta'}</span>`:''}</div>
       </div>
       <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px dashed var(--card-border); font-size:11px; color:var(--ink-dim);">
-        <span>Ticket médio: <b style="color:var(--ink)">${brl(ticketMedio)}</b></span><span>Comissão (${pctComissao}%): <b style="color:var(--accent)">${brl(comissao)}</b></span>
+        <span>Ticket médio: <b style="color:var(--ink)">${brl(ticketMedio)}</b>${ticketBadge}</span><span>Comissão (${pctComissao}%): <b style="color:var(--accent)">${brl(comissao)}</b></span>
       </div>
     </div>`;
   }).join('') : '<div class="empty">Sem vendas neste mês</div>';
@@ -1221,7 +1252,13 @@ function renderDashboard(){
 
 /* ====================== CONFIG ====================== */
 function renderConfig(){
-  document.getElementById('config-vendedoras-list').innerHTML = DB.vendedoras.map(v=>`<div class="list-row"><div><div class="l1">${v.nome}</div><div class="l2">Meta: ${brl(v.meta)}</div></div><button class="del-btn" onclick="cfgRemoveVendor('${v.id}')">🗑️</button></div>`).join('') || '<div class="empty">Nenhuma vendedora cadastrada</div>';
+  document.getElementById('config-vendedoras-list').innerHTML = DB.vendedoras.map(v=>`
+    <div class="list-row">
+      <div style="flex:1;"><div class="l1">${v.nome}</div></div>
+      <input type="number" value="${v.meta}" style="width:100px; padding:8px; font-size:13px;" onchange="cfgUpdateMeta('${v.id}', this.value)">
+      <button class="del-btn" onclick="cfgRemoveVendor('${v.id}')">🗑️</button>
+    </div>`).join('') || '<div class="empty">Nenhuma vendedora cadastrada</div>';
+  document.getElementById('cfg-ticket-meta').value = DB.metaTicketMedio || '';
   document.getElementById('cfg-com-baixo').value = DB.comissao.baixo;
   document.getElementById('cfg-com-alto').value = DB.comissao.alto;
 }
@@ -1236,6 +1273,18 @@ async function cfgAddVendor(){
   showToast('Vendedora adicionada');
 }
 async function cfgRemoveVendor(id){ DB.vendedoras = DB.vendedoras.filter(v=>v.id!==id); await saveDB(); renderConfig(); populateVendedoraSelect(); }
+async function cfgUpdateMeta(id, valor){
+  const v = DB.vendedoras.find(x=>x.id===id);
+  if(!v) return;
+  v.meta = parseFloat(valor)||0;
+  await saveDB();
+  showToast('Meta de '+v.nome+' atualizada');
+}
+async function cfgSaveTicketMeta(){
+  DB.metaTicketMedio = parseFloat(document.getElementById('cfg-ticket-meta').value)||0;
+  await saveDB();
+  showToast('Meta de ticket médio salva');
+}
 async function cfgSaveComissao(){
   DB.comissao.baixo = parseFloat(document.getElementById('cfg-com-baixo').value)||0;
   DB.comissao.alto = parseFloat(document.getElementById('cfg-com-alto').value)||0;
