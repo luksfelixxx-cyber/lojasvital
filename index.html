@@ -219,6 +219,56 @@
     </div>
   </div>
 
+  <!-- RECEBIMENTOS DE CREDIÁRIO -->
+  <div class="view" id="view-recebimentos">
+    <div class="card">
+      <h2>💵 Registrar recebimento de crediário</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Registre aqui quando um cliente paga uma parcela do crediário. Não gera comissão.</p>
+      <label>Cliente</label>
+      <input type="text" id="rec-cliente" list="clientes-datalist" placeholder="Nome do cliente">
+      <label>Valor recebido (R$)</label>
+      <input type="number" inputmode="decimal" id="rec-valor" placeholder="0,00">
+      <label>Forma de recebimento</label>
+      <div class="toggle-row" id="rec-forma-toggle">
+        <button type="button" class="toggle-btn active" data-forma="PIX" onclick="setRecForma('PIX')">PIX</button>
+        <button type="button" class="toggle-btn" data-forma="Crédito" onclick="setRecForma('Crédito')">Crédito</button>
+        <button type="button" class="toggle-btn" data-forma="Débito" onclick="setRecForma('Débito')">Débito</button>
+        <button type="button" class="toggle-btn" data-forma="Dinheiro" onclick="setRecForma('Dinheiro')">Dinheiro</button>
+      </div>
+      <label>Observação (opcional)</label>
+      <input type="text" id="rec-obs" placeholder="Ex: parcela 1/3, ref. calça jeans...">
+      <button class="primary" onclick="salvarRecebimento()">✓ Registrar recebimento</button>
+    </div>
+    <div class="card">
+      <h2>📋 Recebimentos registrados</h2>
+      <div class="grid2" style="margin-bottom:14px;">
+        <div class="stat"><div class="label">Total recebido (mês)</div><div class="value" id="rec-total-mes">R$ 0</div></div>
+        <div class="stat"><div class="label">Total recebido (hoje)</div><div class="value" id="rec-total-hoje">R$ 0</div></div>
+      </div>
+      <div id="rec-list"></div>
+    </div>
+  </div>
+
+  <!-- CRONOLÓGICO DE VENDAS -->
+  <div class="view" id="view-cronologico">
+    <div class="card">
+      <h2>📅 Cronológico de vendas</h2>
+      <div class="row-flex" style="margin-bottom:12px;">
+        <button class="toggle-btn" id="cron-btn-hoje" onclick="setCronFiltro('hoje')" style="flex:1;">Hoje</button>
+        <button class="toggle-btn" id="cron-btn-ontem" onclick="setCronFiltro('ontem')" style="flex:1;">Ontem</button>
+        <button class="toggle-btn" id="cron-btn-data" onclick="setCronFiltro('data')" style="flex:1;">Data</button>
+      </div>
+      <div id="cron-data-picker" style="display:none; margin-bottom:10px;">
+        <input type="date" id="cron-data-input" onchange="renderCronologico()">
+      </div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="stat"><div class="label">Total do período</div><div class="value" id="cron-total">R$ 0</div></div>
+        <div class="stat"><div class="label">Nº de vendas</div><div class="value" id="cron-qtd">0</div></div>
+      </div>
+      <div id="cron-list"></div>
+    </div>
+  </div>
+
   <!-- CREDIÁRIO -->
   <div class="view" id="view-crediario">
     <div class="card">
@@ -372,6 +422,14 @@
       </div>
     </div>
     <div class="card">
+      <h2>💰 Entradas de hoje</h2>
+      <div class="grid2">
+        <div class="stat"><div class="label">Vendas (à vista/cartão)</div><div class="value" id="p-entradas-vendas">R$ 0</div></div>
+        <div class="stat"><div class="label">Recebimentos crediário</div><div class="value" id="p-entradas-rec">R$ 0</div></div>
+        <div class="stat full"><div class="label">Total entrou hoje</div><div class="value" id="p-entradas-total" style="color:var(--accent)">R$ 0</div></div>
+      </div>
+    </div>
+    <div class="card">
       <h2>Minhas vendas de hoje</h2>
       <div id="minhas-vendas-list"></div>
     </div>
@@ -477,7 +535,9 @@
 </main>
 
 <nav class="bottom" id="bottom-nav">
+  <button id="nav-recebimentos" onclick="switchView('recebimentos')"><span class="ic">💵</span><span>Recebimentos</span></button>
   <button id="nav-venda" onclick="switchView('venda')"><span class="ic">🧾</span><span>Lançar</span></button>
+  <button id="nav-cronologico" onclick="switchView('cronologico')"><span class="ic">📅</span><span>Histórico</span></button>
   <button id="nav-crediario" onclick="switchView('crediario')"><span class="ic">🤝</span><span>Crediário</span></button>
   <button id="nav-clientes" onclick="switchView('clientes')"><span class="ic">👥</span><span>Clientes</span></button>
   <button id="nav-conciliacao" onclick="switchView('conciliacao')"><span class="ic">🏦</span><span>Conciliação</span></button>
@@ -661,6 +721,8 @@ function switchView(id){
   if(id==='venda') renderVendaView();
   if(id==='crediario') renderCrediarioView();
   if(id==='clientes'){ renderAniversariantes(); renderClientesRanking(); }
+  if(id==='recebimentos') renderRecebimentos();
+  if(id==='cronologico'){ setCronFiltro('hoje'); }
   if(id==='conciliacao'){ populateMonthSelectConc(); renderConciliacao(); }
   if(id==='painel') renderPainel();
   if(id==='fechamento') renderFechamento();
@@ -1114,6 +1176,13 @@ function renderPainel(){
   document.getElementById('p-comissao-valor').textContent = brl(comissao);
   document.getElementById('p-ticket-medio').textContent = brl(ticketMedio);
 
+  // Entradas do dia: vendas (excluindo crediário) + recebimentos de crediário
+  const vendasHojeEntrada = hoje.reduce((s,v)=>s+(v.pix||0)+(v.credito||0)+(v.debito||0)+(v.dinheiro||0),0);
+  const recHoje = (DB.recebimentos||[]).filter(r=>r.data===todayStr()).reduce((s,r)=>s+r.valor,0);
+  document.getElementById('p-entradas-vendas').textContent = brl(vendasHojeEntrada);
+  document.getElementById('p-entradas-rec').textContent = brl(recHoje);
+  document.getElementById('p-entradas-total').textContent = brl(vendasHojeEntrada + recHoje);
+
   const list = document.getElementById('minhas-vendas-list');
   if(hoje.length===0){ list.innerHTML='<div class="empty"><span class="ic">🗒️</span>Nenhuma venda hoje ainda</div>'; return; }
   list.innerHTML = hoje.slice().reverse().map(v=>`<div class="list-row"><div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.categoria}${nome?'':' · '+v.vendedora}</div></div><div class="l1">${brl(v.total)}</div></div>`).join('');
@@ -1324,6 +1393,101 @@ function exportBackup(){
   const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='backup-caixa-loja-'+todayStr()+'.json'; a.click();
+}
+
+/* ====================== RECEBIMENTOS DE CREDIÁRIO ====================== */
+let recFormaAtiva = 'PIX';
+function setRecForma(forma){
+  recFormaAtiva = forma;
+  document.querySelectorAll('#rec-forma-toggle .toggle-btn').forEach(b=> b.classList.toggle('active', b.dataset.forma===forma));
+}
+async function salvarRecebimento(){
+  const cliente = document.getElementById('rec-cliente').value.trim();
+  const valor = parseFloat(document.getElementById('rec-valor').value)||0;
+  const obs = document.getElementById('rec-obs').value.trim();
+  if(!cliente) return showToast('Informe o nome do cliente');
+  if(valor<=0) return showToast('Informe o valor recebido');
+  if(!DB.recebimentos) DB.recebimentos = [];
+  DB.recebimentos.push({
+    id: uid(), data: todayStr(), cliente, valor, forma: recFormaAtiva, obs
+  });
+  await saveDB();
+  document.getElementById('rec-cliente').value = '';
+  document.getElementById('rec-valor').value = '';
+  document.getElementById('rec-obs').value = '';
+  showToast('Recebimento registrado ✓');
+  renderRecebimentos();
+}
+async function excluirRecebimento(id){
+  if(!confirm('Excluir este recebimento?')) return;
+  DB.recebimentos = DB.recebimentos.filter(r=>r.id!==id);
+  await saveDB();
+  renderRecebimentos();
+}
+function renderRecebimentos(){
+  if(!DB.recebimentos) DB.recebimentos = [];
+  const mesAtual = todayStr().slice(0,7);
+  const totalMes = DB.recebimentos.filter(r=>r.data.slice(0,7)===mesAtual).reduce((s,r)=>s+r.valor,0);
+  const totalHoje = DB.recebimentos.filter(r=>r.data===todayStr()).reduce((s,r)=>s+r.valor,0);
+  document.getElementById('rec-total-mes').textContent = brl(totalMes);
+  document.getElementById('rec-total-hoje').textContent = brl(totalHoje);
+
+  const lista = DB.recebimentos.slice().sort((a,b)=>b.data.localeCompare(a.data)).slice(0,30);
+  const list = document.getElementById('rec-list');
+  list.innerHTML = lista.length ? lista.map(r=>`
+    <div class="list-row">
+      <div>
+        <div class="l1">${r.cliente}</div>
+        <div class="l2">${fmtDate(r.data)} · ${r.forma}${r.obs?' · '+r.obs:''}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="l1" style="color:var(--green)">${brl(r.valor)}</div>
+        <button class="del-btn" onclick="excluirRecebimento('${r.id}')">🗑️</button>
+      </div>
+    </div>`).join('') : '<div class="empty">Nenhum recebimento registrado ainda</div>';
+}
+
+/* ====================== CRONOLÓGICO DE VENDAS ====================== */
+let cronFiltro = 'hoje';
+function setCronFiltro(filtro){
+  cronFiltro = filtro;
+  document.querySelectorAll('[id^=cron-btn-]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cron-btn-'+filtro).classList.add('active');
+  document.getElementById('cron-data-picker').style.display = filtro==='data' ? 'block' : 'none';
+  if(filtro!=='data') renderCronologico();
+}
+function getCronData(){
+  if(cronFiltro==='hoje') return todayStr();
+  if(cronFiltro==='ontem') return addDays(todayStr(), -1);
+  return document.getElementById('cron-data-input').value || todayStr();
+}
+function renderCronologico(){
+  const data = getCronData();
+  const vendas = DB.vendas.filter(v=>v.data===data).slice().reverse();
+  const total = vendas.reduce((s,v)=>s+v.total,0);
+  document.getElementById('cron-total').textContent = brl(total);
+  document.getElementById('cron-qtd').textContent = vendas.length;
+  const list = document.getElementById('cron-list');
+  if(vendas.length===0){ list.innerHTML='<div class="empty"><span class="ic">📭</span>Nenhuma venda nesta data</div>'; return; }
+
+  // Agrupar por vendedora
+  const porVendedora = {};
+  vendas.forEach(v=>{ if(!porVendedora[v.vendedora]) porVendedora[v.vendedora]=[]; porVendedora[v.vendedora].push(v); });
+
+  list.innerHTML = Object.entries(porVendedora).map(([nome, vv])=>{
+    const subtotal = vv.reduce((s,v)=>s+v.total,0);
+    return `<div style="margin-bottom:12px;">
+      <div style="font-size:12px; color:var(--accent); font-weight:700; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--card-border);">${nome} — ${brl(subtotal)}</div>
+      ${vv.map(v=>`<div class="list-row">
+        <div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.categoria}${v.clienteNome?' · '+v.clienteNome:''}</div></div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div class="l1">${brl(v.total)}</div>
+          ${(v.clienteTelefone||(v.cliente&&v.cliente.telefone))?`<button class="del-btn" style="color:var(--whats);" onclick="reenviarWhatsApp('${v.id}')">📲</button>`:''}
+          <button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
 }
 
 /* ====================== INIT ====================== */
