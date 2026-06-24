@@ -61,12 +61,31 @@
   button.secondary{ width:100%; background:transparent; color:var(--ink-dim); border:1px solid var(--card-border); border-radius:10px; padding:12px; font-size:13px; margin-top:8px; cursor:pointer; font-family:var(--font-body); }
   button.whats{ width:100%; background:var(--whats); color:#fff; border:none; border-radius:10px; padding:10px; font-size:12px; font-weight:700; margin-top:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
   button.add-item{ width:100%; background:var(--accent-soft); color:var(--accent); border:1px dashed var(--accent); border-radius:10px; padding:11px; font-size:13px; font-weight:700; margin-top:10px; cursor:pointer; font-family:var(--font-body); }
-  nav.bottom{ position:fixed; bottom:0; left:0; right:0; background:var(--bg-soft); border-top:1px solid var(--card-border); display:flex; z-index:50; padding-bottom:env(safe-area-inset-bottom); overflow-x:auto; }
-  nav.bottom button{ flex:1 0 auto; min-width:58px; background:none; border:none; color:var(--ink-dim); padding:9px 4px 7px; font-size:9px; font-family:var(--font-body); display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; }
-  nav.bottom button .ic{ font-size:16px; }
+  nav.bottom{
+    position:fixed; bottom:0; left:0; right:0; background:var(--bg-soft);
+    border-top:1px solid var(--card-border); display:flex; z-index:50;
+    padding-bottom:env(safe-area-inset-bottom);
+    overflow-x:auto; overflow-y:hidden;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  nav.bottom::-webkit-scrollbar{ display:none; }
+  nav.bottom button{
+    flex:0 0 64px; background:none; border:none; color:var(--ink-dim);
+    padding:8px 0 6px; font-size:9px; font-family:var(--font-body);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; cursor:pointer; white-space:nowrap; min-height:56px;
+  }
+  nav.bottom button .ic{ font-size:18px; line-height:1; display:block; }
+  nav.bottom button span:not(.ic){ display:block; font-size:9px; }
   nav.bottom button.active{ color:var(--accent); }
-  .view{ display:none; } .view.active{ display:block; animation:fadein .2s ease; }
-  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .view{ display:none; }
+  .view.active{ display:block; animation:fadein .15s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:translateY(0);} }
+  .skeleton{ background:linear-gradient(90deg, var(--card-border) 25%, var(--bg-soft) 50%, var(--card-border) 75%); background-size:200% 100%; animation:shimmer 1.2s infinite; border-radius:8px; }
+  @keyframes shimmer{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .skeleton-stat{ height:70px; margin-bottom:10px; }
+  .skeleton-row{ height:44px; margin-bottom:8px; }
+  .skeleton-title{ height:20px; width:60%; margin-bottom:14px; }
   .list-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--card-border); font-size:13px; gap:8px; }
   .list-row:last-child{ border-bottom:none; }
   .list-row .l1{ font-weight:600; } .list-row .l2{ color:var(--ink-dim); font-size:11px; margin-top:2px; }
@@ -123,8 +142,8 @@
       max-width: 1280px; left:50%; transform:translateX(-50%);
       border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
     }
-    nav.bottom button{ font-size:12px; padding:12px 8px; }
-    nav.bottom button .ic{ font-size:20px; }
+    nav.bottom button{ flex:0 0 88px; font-size:11px; padding:12px 4px; min-height:60px; }
+    nav.bottom button .ic{ font-size:22px; }
     .toast{ left:50%; }
   }
   @media (min-width: 1200px){
@@ -172,12 +191,14 @@
       <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border);">🛍️ Produtos da venda</label>
       <div id="venda-itens-list"></div>
       <div class="row-flex" style="margin-top:6px;">
-        <input type="text" id="venda-item-categoria" placeholder="Categoria (ex: Sapatos)" style="flex:1;">
+        <input type="text" id="venda-item-categoria" placeholder="Categoria (ex: Sapatos)" style="flex:1;" list="cat-datalist" autocomplete="off">
       </div>
       <div class="row-flex" style="margin-top:6px;">
-        <input type="text" id="venda-item-produto" placeholder="Produto" style="flex:2;">
+        <input type="text" id="venda-item-produto" placeholder="Produto" style="flex:2;" list="prod-datalist" autocomplete="off">
         <input type="number" inputmode="decimal" id="venda-item-valor" placeholder="Valor R$" style="flex:1;">
       </div>
+      <datalist id="cat-datalist"></datalist>
+      <datalist id="prod-datalist"></datalist>
       <button class="add-item" onclick="addItemCarrinho('venda')">+ Adicionar produto à venda</button>
 
       <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border);">Forma(s) de pagamento</label>
@@ -289,10 +310,10 @@
       <label style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--card-border);">🛍️ Produtos da venda</label>
       <div id="cred-itens-list"></div>
       <div class="row-flex" style="margin-top:6px;">
-        <input type="text" id="cred-item-categoria" placeholder="Categoria (ex: Sapatos)" style="flex:1;">
+        <input type="text" id="cred-item-categoria" placeholder="Categoria (ex: Sapatos)" style="flex:1;" list="cat-datalist" autocomplete="off">
       </div>
       <div class="row-flex" style="margin-top:6px;">
-        <input type="text" id="cred-item-produto" placeholder="Produto" style="flex:2;">
+        <input type="text" id="cred-item-produto" placeholder="Produto" style="flex:2;" list="prod-datalist" autocomplete="off">
         <input type="number" inputmode="decimal" id="cred-item-valor" placeholder="Valor R$" style="flex:1;">
       </div>
       <button class="add-item" onclick="addItemCarrinho('cred')">+ Adicionar produto à venda</button>
@@ -379,6 +400,11 @@
     </div>
     <div class="card">
       <h2>Conferência por forma de pagamento</h2>
+      <div class="card" style="background:var(--bg-soft); margin-bottom:10px;">
+        <div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px;">📎 Importar extrato bancário (CSV) para conferência automática</div>
+        <input type="file" id="csv-upload" accept=".csv,.txt" onchange="processarCSV(event)" style="font-size:12px; color:var(--ink-dim); background:transparent; border:1px dashed var(--card-border); border-radius:8px; padding:8px; width:100%;">
+        <div id="csv-result" style="margin-top:8px; font-size:12px;"></div>
+      </div>
       <div class="tabbar" id="conc-tabbar">
         <button class="active" onclick="setConcTab('pix')">PIX</button>
         <button onclick="setConcTab('credito')">Crédito</button>
@@ -631,6 +657,7 @@ async function saveDB(){
 function onRemoteUpdate(){
   populateVendedoraSelect();
   populateClientesDatalist();
+  populateAutocomplete();
   const activeView = document.querySelector('.view.active');
   if(!activeView) return;
   const id = activeView.id.replace('view-','');
@@ -715,19 +742,29 @@ function upsertCliente(nome, telefone, endereco, aniversario){
 function switchView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('view-'+id).classList.add('active');
+  const view = document.getElementById('view-'+id);
+  if(view) view.classList.add('active');
   const navBtn = document.getElementById('nav-'+id);
   if(navBtn) navBtn.classList.add('active');
-  if(id==='venda') renderVendaView();
-  if(id==='crediario') renderCrediarioView();
-  if(id==='clientes'){ renderAniversariantes(); renderClientesRanking(); }
-  if(id==='recebimentos') renderRecebimentos();
-  if(id==='cronologico'){ setCronFiltro('hoje'); }
-  if(id==='conciliacao'){ populateMonthSelectConc(); renderConciliacao(); }
-  if(id==='painel') renderPainel();
-  if(id==='fechamento') renderFechamento();
-  if(id==='dashboard'){ populateMonthSelect(); renderDashboard(); }
-  if(id==='config') renderConfig();
+
+  // Skeleton nas abas que carregam dados pesados
+  if(id==='dashboard'){ showSkeleton('d-ranking'); showSkeleton('d-produtos'); }
+  if(id==='clientes') showSkeleton('clientes-ranking-list');
+  if(id==='cronologico') showSkeleton('cron-list');
+
+  // requestAnimationFrame garante que o skeleton aparece antes do render pesado
+  requestAnimationFrame(()=>{
+    if(id==='venda') renderVendaView();
+    if(id==='crediario') renderCrediarioView();
+    if(id==='clientes'){ renderAniversariantes(); renderClientesRanking(); }
+    if(id==='recebimentos') renderRecebimentos();
+    if(id==='cronologico'){ setCronFiltro('hoje'); }
+    if(id==='conciliacao'){ populateMonthSelectConc(); renderConciliacao(); }
+    if(id==='painel') renderPainel();
+    if(id==='fechamento') renderFechamento();
+    if(id==='dashboard'){ populateMonthSelect(); renderDashboard(); }
+    if(id==='config') renderConfig();
+  });
 }
 
 /* ====================== CARRINHO DE ITENS ====================== */
@@ -1395,6 +1432,84 @@ function exportBackup(){
   const a = document.createElement('a'); a.href=url; a.download='backup-caixa-loja-'+todayStr()+'.json'; a.click();
 }
 
+/* ====================== AUTOCOMPLETE CATEGORIA E PRODUTO ====================== */
+function populateAutocomplete(){
+  const cats = new Set();
+  const prods = new Set();
+  (DB.vendas||[]).forEach(v=>{
+    if(v.categoria && v.categoria !== 'Importado') cats.add(v.categoria);
+    (v.itens||[]).forEach(i=>{ if(i.categoria && i.categoria !== 'Importado') cats.add(i.categoria); if(i.produto) prods.add(i.produto); });
+    if(v.produto && v.produto !== 'Importado') prods.add(v.produto);
+  });
+  (DB.creditos||[]).forEach(c=>{
+    if(c.categoria) cats.add(c.categoria);
+    (c.itens||[]).forEach(i=>{ if(i.categoria) cats.add(i.categoria); if(i.produto) prods.add(i.produto); });
+  });
+  const catDl = document.getElementById('cat-datalist');
+  const prodDl = document.getElementById('prod-datalist');
+  if(catDl) catDl.innerHTML = Array.from(cats).sort().map(c=>`<option value="${c}">`).join('');
+  if(prodDl) prodDl.innerHTML = Array.from(prods).sort().map(p=>`<option value="${p}">`).join('');
+}
+
+/* ====================== SKELETON SCREEN ====================== */
+function showSkeleton(containerId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = `
+    <div class="skeleton skeleton-title"></div>
+    <div class="skeleton skeleton-stat"></div>
+    <div class="skeleton skeleton-stat"></div>
+    <div class="skeleton skeleton-row"></div>
+    <div class="skeleton skeleton-row"></div>
+    <div class="skeleton skeleton-row"></div>`;
+}
+
+/* ====================== PROCESSAMENTO CSV EXTRATO ====================== */
+function processarCSV(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const result = document.getElementById('csv-result');
+  result.innerHTML = '<span style="color:var(--ink-dim)">Lendo arquivo...</span>';
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const text = e.target.result;
+    const linhas = text.split('\n').filter(l=>l.trim());
+    // Extrair valores numéricos do CSV (busca padrões R$ ou números com vírgula/ponto)
+    const valoresCSV = [];
+    linhas.forEach(linha=>{
+      const matches = linha.match(/[\d]+[.,][\d]{2}/g);
+      if(matches) matches.forEach(m=> valoresCSV.push(parseFloat(m.replace(',','.'))));
+    });
+    if(valoresCSV.length === 0){
+      result.innerHTML = '<span style="color:var(--red)">Nenhum valor encontrado no arquivo. Verifique o formato.</span>';
+      return;
+    }
+    // Comparar com vendas do mês/conciliação
+    const vendasMes = DB.vendas.filter(v=>v.data.slice(0,7)===concMonth);
+    const totalSistema = {
+      pix: vendasMes.reduce((s,v)=>s+(v.pix||0),0),
+      credito: vendasMes.reduce((s,v)=>s+(v.credito||0),0),
+      debito: vendasMes.reduce((s,v)=>s+(v.debito||0),0),
+    };
+    const totalCSV = valoresCSV.reduce((s,v)=>s+v,0);
+    const totalSis = totalSistema.pix + totalSistema.credito + totalSistema.debito;
+    const dif = totalCSV - totalSis;
+    result.innerHTML = `
+      <div style="background:var(--card); border-radius:8px; padding:10px; margin-top:6px;">
+        <div style="font-size:11px; color:var(--ink-dim); margin-bottom:6px;">📊 Resultado da comparação</div>
+        <div class="list-row" style="padding:6px 0;"><span>Valores encontrados no CSV</span><b>${valoresCSV.length} lançamentos</b></div>
+        <div class="list-row" style="padding:6px 0;"><span>Total CSV</span><b>${brl(totalCSV)}</b></div>
+        <div class="list-row" style="padding:6px 0;"><span>Total sistema (PIX+Crédito+Débito)</span><b>${brl(totalSis)}</b></div>
+        <div class="list-row" style="padding:6px 0; border-bottom:none;">
+          <span>Diferença</span>
+          <b style="color:${Math.abs(dif)<0.01?'var(--green)':'var(--red)'}">${(dif>=0?'+':'')}${brl(dif)}</b>
+        </div>
+        ${Math.abs(dif)<0.01 ? '<div style="color:var(--green); font-size:12px; margin-top:6px;">✓ Valores conferem!</div>' : '<div style="color:var(--ink-dim); font-size:11px; margin-top:6px;">Verifique lançamentos manuais ou taxas do banco.</div>'}
+      </div>`;
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
 /* ====================== RECEBIMENTOS DE CREDIÁRIO ====================== */
 let recFormaAtiva = 'PIX';
 function setRecForma(forma){
@@ -1496,6 +1611,7 @@ function renderCronologico(){
   await loadDB();
   populateVendedoraSelect();
   populateClientesDatalist();
+  populateAutocomplete();
   updateOfflineIndicator();
   switchView('venda');
 })();
