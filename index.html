@@ -1683,7 +1683,7 @@ function renderNovPreview(){
   const desconto = document.getElementById('nov-desconto').value || 'X';
   const extra = document.getElementById('nov-extra').value.trim();
   const qtd = novSelecionados.size;
-  const msg = `Olá, [Nome]! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n\nVenha nos visitar hoje e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n— Lojas Vital`;
+  const msg = `Olá, [Nome]! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n⚠️ Desconto válido somente hoje, ${new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'})}.\n\nVenha nos visitar e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n📸 Gostou? Marca a gente no Instagram! @lojasVital\n\n— Lojas Vital`;
   document.getElementById('nov-preview').textContent = msg;
   const btn = document.querySelector('#view-novidades .primary');
   if(btn) btn.textContent = `📲 Enviar para ${qtd} cliente(s) selecionado(s)`;
@@ -1705,7 +1705,7 @@ function enviarProximoNov(lista, idx, desconto, extra){
   if(idx >= lista.length){ showToast(`✓ ${lista.length} mensagens abertas`); return; }
   const c = lista[idx];
   const fone = onlyDigits(c.telefone);
-  const msg = `Olá, ${c.nome}! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n\nVenha nos visitar hoje e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n— Lojas Vital`;
+  const msg = `Olá, ${c.nome}! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n⚠️ Desconto válido somente hoje, ${new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'})}.\n\nVenha nos visitar e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n📸 Gostou? Marca a gente no Instagram! @lojasVital\n\n— Lojas Vital`;
   window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
   setTimeout(()=> enviarProximoNov(lista, idx+1, desconto, extra), 800);
 }
@@ -1775,7 +1775,7 @@ function enviarProximoCB(lista, idx, pct){
   const fone = onlyDigits(c.telefone);
   const cashback = c.total*(pct/100);
   const validade = addDays(c.data, 15);
-  const msg = `Olá, ${c.nome}! 💜\n\nObrigado por comprar nas Lojas Vital!\n\nTemos uma ótima notícia: você ganhou um cashback de ${brl(cashback)} (${pct}% das suas compras)! 🎉\n\nUse esse cashback na sua próxima visita.\n⚠️ Válido até ${fmtDate(validade)} (15 dias a partir da sua última compra).\n\nEstamos te esperando! 💜✨\n\n— Lojas Vital`;
+  const msg = `Olá, ${c.nome}! 💜\n\nObrigado por comprar nas Lojas Vital!\n\nTemos uma ótima notícia: você ganhou um cashback de ${brl(cashback)}! 🎉\n\nUse esse cashback na sua próxima visita.\n⚠️ Válido até ${fmtDate(validade)}.\n\nEstamos te esperando! 💜✨\n\n📸 Gostou? Marca a gente no Instagram! @lojasVital\n\n— Lojas Vital`;
   window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
   setTimeout(()=> enviarProximoCB(lista, idx+1, pct), 800);
 }
