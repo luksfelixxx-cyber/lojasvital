@@ -251,28 +251,43 @@
   <div class="view" id="view-recebimentos">
     <div class="card">
       <h2>💵 Registrar recebimento de crediário</h2>
-      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Registre aqui quando um cliente paga uma parcela do crediário. Não gera comissão.</p>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Registre quando um cliente paga parcela do crediário. Não gera comissão.</p>
       <label>Cliente</label>
       <input type="text" id="rec-cliente" list="clientes-datalist" placeholder="Nome do cliente">
-      <label>Valor recebido (R$)</label>
-      <input type="number" inputmode="decimal" id="rec-valor" placeholder="0,00">
-      <label>Forma de recebimento</label>
-      <div class="toggle-row" id="rec-forma-toggle">
-        <button type="button" class="toggle-btn active" data-forma="PIX" onclick="setRecForma('PIX')">PIX</button>
-        <button type="button" class="toggle-btn" data-forma="Crédito" onclick="setRecForma('Crédito')">Crédito</button>
-        <button type="button" class="toggle-btn" data-forma="Débito" onclick="setRecForma('Débito')">Débito</button>
-        <button type="button" class="toggle-btn" data-forma="Dinheiro" onclick="setRecForma('Dinheiro')">Dinheiro</button>
-      </div>
       <label>Observação (opcional)</label>
       <input type="text" id="rec-obs" placeholder="Ex: parcela 1/3, ref. calça jeans...">
+      <label>Forma(s) de recebimento</label>
+      <div class="pay-grid">
+        <div class="pay-field">
+          <div class="tag" style="color:var(--pix)"><span class="dot" style="background:var(--pix)"></span>PIX</div>
+          <input type="number" inputmode="decimal" id="rec-pix" placeholder="0,00" oninput="updateRecTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--credito)"><span class="dot" style="background:var(--credito)"></span>Crédito</div>
+          <input type="number" inputmode="decimal" id="rec-credito" placeholder="0,00" oninput="updateRecTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--debito)"><span class="dot" style="background:var(--debito)"></span>Débito</div>
+          <input type="number" inputmode="decimal" id="rec-debito" placeholder="0,00" oninput="updateRecTotal()">
+        </div>
+        <div class="pay-field">
+          <div class="tag" style="color:var(--dinheiro)"><span class="dot" style="background:var(--dinheiro)"></span>Dinheiro</div>
+          <input type="number" inputmode="decimal" id="rec-dinheiro" placeholder="0,00" oninput="updateRecTotal()">
+        </div>
+      </div>
+      <div class="total-line">
+        <div class="label">Total do recebimento</div>
+        <div class="value" id="rec-total-valor">R$ 0,00</div>
+      </div>
       <button class="primary" onclick="salvarRecebimento()">✓ Registrar recebimento</button>
     </div>
     <div class="card">
-      <h2>📋 Recebimentos registrados</h2>
+      <h2>📋 Recebimentos do mês</h2>
       <div class="grid2" style="margin-bottom:14px;">
         <div class="stat"><div class="label">Total recebido (mês)</div><div class="value" id="rec-total-mes">R$ 0</div></div>
         <div class="stat"><div class="label">Total recebido (hoje)</div><div class="value" id="rec-total-hoje">R$ 0</div></div>
       </div>
+      <div style="margin-bottom:12px;" id="rec-formas-breakdown"></div>
       <div id="rec-list"></div>
     </div>
   </div>
@@ -294,6 +309,46 @@
         <div class="stat"><div class="label">Nº de vendas</div><div class="value" id="cron-qtd">0</div></div>
       </div>
       <div id="cron-list"></div>
+    </div>
+  </div>
+
+  <!-- PROMOÇÕES / NOVIDADES -->
+  <div class="view" id="view-novidades">
+    <div class="card">
+      <h2>🎁 Mensagem de novidades</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Avise seus clientes sobre novidades e ofereça um desconto especial para visita.</p>
+      <label>Desconto especial (%)</label>
+      <input type="number" id="nov-desconto" placeholder="Ex: 10" min="1" max="100">
+      <label>Mensagem adicional (opcional)</label>
+      <input type="text" id="nov-extra" placeholder="Ex: novos modelos de verão chegaram!">
+      <label style="margin-top:14px; border-top:1px dashed var(--card-border); padding-top:14px;">Selecionar clientes para envio</label>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button class="toggle-btn" onclick="selecionarTodosNov(true)" style="flex:1;">✓ Todos</button>
+        <button class="toggle-btn" onclick="selecionarTodosNov(false)" style="flex:1;">✕ Nenhum</button>
+      </div>
+      <div id="nov-clientes-list" style="max-height:220px; overflow-y:auto;"></div>
+      <button class="primary" onclick="confirmarEnvioNov()">📲 Enviar para selecionados</button>
+    </div>
+    <div class="card" style="background:var(--bg-soft);">
+      <h2>Prévia da mensagem</h2>
+      <div id="nov-preview" style="font-size:12px; color:var(--ink-dim); white-space:pre-wrap; line-height:1.6;"></div>
+    </div>
+  </div>
+
+  <!-- CASHBACK -->
+  <div class="view" id="view-cashback">
+    <div class="card">
+      <h2>💸 Enviar cashback para clientes</h2>
+      <p style="font-size:11px; color:var(--ink-dim); margin-top:-6px;">Clientes que compraram à vista, no crédito ou débito recebem uma mensagem com o valor do cashback (válido por 15 dias).</p>
+      <label>Percentual de cashback (%)</label>
+      <input type="number" id="cb-percentual" placeholder="Ex: 5" min="1" max="50" oninput="renderCashbackLista()">
+      <label style="margin-top:14px; border-top:1px dashed var(--card-border); padding-top:14px;">Clientes elegíveis (compraram à vista/crédito/débito)</label>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button class="toggle-btn" onclick="selecionarTodosCB(true)" style="flex:1;">✓ Todos</button>
+        <button class="toggle-btn" onclick="selecionarTodosCB(false)" style="flex:1;">✕ Nenhum</button>
+      </div>
+      <div id="cb-clientes-list" style="max-height:260px; overflow-y:auto;"></div>
+      <button class="primary" onclick="confirmarEnvioCB()">📲 Enviar cashback selecionados</button>
     </div>
   </div>
 
@@ -568,15 +623,17 @@
 </main>
 
 <nav class="bottom" id="bottom-nav">
-  <button id="nav-recebimentos" onclick="switchView('recebimentos')"><span class="ic">💵</span><span>Recebimentos</span></button>
-  <button id="nav-venda" onclick="switchView('venda')"><span class="ic">🧾</span><span>Lançar</span></button>
-  <button id="nav-cronologico" onclick="switchView('cronologico')"><span class="ic">📅</span><span>Histórico</span></button>
-  <button id="nav-crediario" onclick="switchView('crediario')"><span class="ic">🤝</span><span>Crediário</span></button>
-  <button id="nav-clientes" onclick="switchView('clientes')"><span class="ic">👥</span><span>Clientes</span></button>
-  <button id="nav-conciliacao" onclick="switchView('conciliacao')"><span class="ic">🏦</span><span>Conciliação</span></button>
-  <button id="nav-painel" onclick="switchView('painel')"><span class="ic">📈</span><span>Painel</span></button>
   <button id="nav-fechamento" onclick="switchView('fechamento')"><span class="ic">🧮</span><span>Fechamento</span></button>
+  <button id="nav-venda" onclick="switchView('venda')"><span class="ic">🧾</span><span>Lançar</span></button>
+  <button id="nav-crediario" onclick="switchView('crediario')"><span class="ic">🤝</span><span>Crediário</span></button>
+  <button id="nav-recebimentos" onclick="switchView('recebimentos')"><span class="ic">💵</span><span>Recebimentos</span></button>
+  <button id="nav-cronologico" onclick="switchView('cronologico')"><span class="ic">📅</span><span>Histórico</span></button>
+  <button id="nav-clientes" onclick="switchView('clientes')"><span class="ic">👥</span><span>Clientes</span></button>
+  <button id="nav-painel" onclick="switchView('painel')"><span class="ic">📈</span><span>Painel</span></button>
+  <button id="nav-conciliacao" onclick="switchView('conciliacao')"><span class="ic">🏦</span><span>Conciliação</span></button>
   <button id="nav-dashboard" onclick="switchView('dashboard')"><span class="ic">📊</span><span>Dashboard</span></button>
+  <button id="nav-novidades" onclick="switchView('novidades')"><span class="ic">🎁</span><span>Promoções</span></button>
+  <button id="nav-cashback" onclick="switchView('cashback')"><span class="ic">💸</span><span>Cashback</span></button>
   <button id="nav-config" onclick="switchView('config')"><span class="ic">⚙️</span><span>Config</span></button>
 </nav>
 
@@ -766,6 +823,8 @@ function switchView(id){
     if(id==='clientes'){ renderAniversariantes(); renderClientesRanking(); }
     if(id==='recebimentos') renderRecebimentos();
     if(id==='cronologico'){ setCronFiltro('hoje'); }
+    if(id==='novidades') renderNovidades();
+    if(id==='cashback') renderCashbackLista();
     if(id==='conciliacao'){ populateMonthSelectConc(); renderConciliacao(); }
     if(id==='painel') renderPainel();
     if(id==='fechamento') renderFechamento();
@@ -1367,7 +1426,7 @@ function renderDashboard(){
     return `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span style="color:${f.color}">${f.label}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%; background:${f.color}"></div></div></div>`;
   }).join('');
 
-  const cats = {}; vendasMes.forEach(v=> cats[v.categoria]=(cats[v.categoria]||0)+v.total);
+  const cats = {}; vendasMes.forEach(v=>{ const cat = (v.categoria||'Outros').trim().toLowerCase().replace(/\b\w/g,l=>l.toUpperCase()); cats[cat]=(cats[cat]||0)+v.total; });
   const catArr = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
   document.getElementById('d-categorias').innerHTML = catArr.length ? catArr.map(([cat,v])=>{ const pct=total>0?(v/total*100):0; return `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span>${cat}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div></div>`; }).join('') : '<div class="empty">Sem vendas neste mês</div>';
 
@@ -1519,24 +1578,29 @@ function processarCSV(event){
 
 /* ====================== RECEBIMENTOS DE CREDIÁRIO ====================== */
 let recFormaAtiva = 'PIX';
-function setRecForma(forma){
-  recFormaAtiva = forma;
-  document.querySelectorAll('#rec-forma-toggle .toggle-btn').forEach(b=> b.classList.toggle('active', b.dataset.forma===forma));
+/* ====================== RECEBIMENTOS ====================== */
+function updateRecTotal(){
+  const total = ['pix','credito','debito','dinheiro'].reduce((s,k)=>s+(parseFloat(document.getElementById('rec-'+k).value)||0),0);
+  document.getElementById('rec-total-valor').textContent = brl(total);
+  return total;
 }
 async function salvarRecebimento(){
   const cliente = document.getElementById('rec-cliente').value.trim();
-  const valor = parseFloat(document.getElementById('rec-valor').value)||0;
+  const pix      = parseFloat(document.getElementById('rec-pix').value)||0;
+  const credito  = parseFloat(document.getElementById('rec-credito').value)||0;
+  const debito   = parseFloat(document.getElementById('rec-debito').value)||0;
+  const dinheiro = parseFloat(document.getElementById('rec-dinheiro').value)||0;
+  const valor    = pix+credito+debito+dinheiro;
   const obs = document.getElementById('rec-obs').value.trim();
   if(!cliente) return showToast('Informe o nome do cliente');
-  if(valor<=0) return showToast('Informe o valor recebido');
+  if(valor<=0) return showToast('Informe ao menos um valor recebido');
   if(!DB.recebimentos) DB.recebimentos = [];
-  DB.recebimentos.push({
-    id: uid(), data: todayStr(), cliente, valor, forma: recFormaAtiva, obs
-  });
+  DB.recebimentos.push({ id:uid(), data:todayStr(), cliente, valor, pix, credito, debito, dinheiro, obs });
   await saveDB();
-  document.getElementById('rec-cliente').value = '';
-  document.getElementById('rec-valor').value = '';
-  document.getElementById('rec-obs').value = '';
+  ['pix','credito','debito','dinheiro'].forEach(k=> document.getElementById('rec-'+k).value='');
+  document.getElementById('rec-cliente').value='';
+  document.getElementById('rec-obs').value='';
+  updateRecTotal();
   showToast('Recebimento registrado ✓');
   renderRecebimentos();
 }
@@ -1549,24 +1613,171 @@ async function excluirRecebimento(id){
 function renderRecebimentos(){
   if(!DB.recebimentos) DB.recebimentos = [];
   const mesAtual = todayStr().slice(0,7);
-  const totalMes = DB.recebimentos.filter(r=>r.data.slice(0,7)===mesAtual).reduce((s,r)=>s+r.valor,0);
-  const totalHoje = DB.recebimentos.filter(r=>r.data===todayStr()).reduce((s,r)=>s+r.valor,0);
-  document.getElementById('rec-total-mes').textContent = brl(totalMes);
+  const doMes = DB.recebimentos.filter(r=>r.data.slice(0,7)===mesAtual);
+  const deHoje = DB.recebimentos.filter(r=>r.data===todayStr());
+  const totalMes  = doMes.reduce((s,r)=>s+r.valor,0);
+  const totalHoje = deHoje.reduce((s,r)=>s+r.valor,0);
+  document.getElementById('rec-total-mes').textContent  = brl(totalMes);
   document.getElementById('rec-total-hoje').textContent = brl(totalHoje);
 
-  const lista = DB.recebimentos.slice().sort((a,b)=>b.data.localeCompare(a.data)).slice(0,30);
+  // Breakdown por forma (mês)
+  const formas = [
+    {k:'pix',     label:'PIX',     color:'var(--pix)'},
+    {k:'credito', label:'Crédito', color:'var(--credito)'},
+    {k:'debito',  label:'Débito',  color:'var(--debito)'},
+    {k:'dinheiro',label:'Dinheiro',color:'var(--dinheiro)'},
+  ];
+  document.getElementById('rec-formas-breakdown').innerHTML = formas.map(f=>{
+    const v = doMes.reduce((s,r)=>s+(r[f.k]||0),0);
+    if(v<=0) return '';
+    const pct = totalMes>0 ? (v/totalMes*100) : 0;
+    return `<div style="margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
+        <span style="color:${f.color}">${f.label}</span><span>${brl(v)} (${pct.toFixed(0)}%)</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%; background:${f.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  const lista = DB.recebimentos.slice().sort((a,b)=>b.data.localeCompare(a.data)).slice(0,40);
   const list = document.getElementById('rec-list');
-  list.innerHTML = lista.length ? lista.map(r=>`
-    <div class="list-row">
+  list.innerHTML = lista.length ? lista.map(r=>{
+    const formasTxt = [
+      r.pix>0      ? `PIX ${brl(r.pix)}`      : '',
+      r.credito>0  ? `Crédito ${brl(r.credito)}` : '',
+      r.debito>0   ? `Débito ${brl(r.debito)}`  : '',
+      r.dinheiro>0 ? `Dinheiro ${brl(r.dinheiro)}` : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="list-row">
       <div>
         <div class="l1">${r.cliente}</div>
-        <div class="l2">${fmtDate(r.data)} · ${r.forma}${r.obs?' · '+r.obs:''}</div>
+        <div class="l2">${fmtDate(r.data)} · ${formasTxt}${r.obs?' · '+r.obs:''}</div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
         <div class="l1" style="color:var(--green)">${brl(r.valor)}</div>
         <button class="del-btn" onclick="excluirRecebimento('${r.id}')">🗑️</button>
       </div>
-    </div>`).join('') : '<div class="empty">Nenhum recebimento registrado ainda</div>';
+    </div>`;
+  }).join('') : '<div class="empty">Nenhum recebimento ainda</div>';
+}
+
+/* ====================== PROMOÇÕES / NOVIDADES ====================== */
+let novSelecionados = new Set();
+function renderNovidades(){
+  const clientes = DB.clientes.filter(c=>c.telefone);
+  const list = document.getElementById('nov-clientes-list');
+  list.innerHTML = clientes.length ? clientes.map(c=>`
+    <div class="checkrow">
+      <input type="checkbox" id="nov-cb-${c.id}" ${novSelecionados.has(c.id)?'checked':''} onchange="toggleNov('${c.id}')">
+      <label for="nov-cb-${c.id}" style="flex:1; margin:0; font-size:13px; color:var(--ink); cursor:pointer;">${c.nome}</label>
+      <span style="font-size:11px; color:var(--ink-dim)">${c.telefone}</span>
+    </div>`).join('') : '<div class="empty">Nenhum cliente com telefone cadastrado</div>';
+  renderNovPreview();
+}
+function toggleNov(id){ novSelecionados.has(id) ? novSelecionados.delete(id) : novSelecionados.add(id); renderNovPreview(); }
+function selecionarTodosNov(val){
+  DB.clientes.filter(c=>c.telefone).forEach(c=> val ? novSelecionados.add(c.id) : novSelecionados.delete(c.id));
+  renderNovidades();
+}
+function renderNovPreview(){
+  const desconto = document.getElementById('nov-desconto').value || 'X';
+  const extra = document.getElementById('nov-extra').value.trim();
+  const qtd = novSelecionados.size;
+  const msg = `Olá, [Nome]! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n\nVenha nos visitar hoje e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n— Lojas Vital`;
+  document.getElementById('nov-preview').textContent = msg;
+  const btn = document.querySelector('#view-novidades .primary');
+  if(btn) btn.textContent = `📲 Enviar para ${qtd} cliente(s) selecionado(s)`;
+}
+function confirmarEnvioNov(){
+  const qtd = novSelecionados.size;
+  if(qtd===0) return showToast('Selecione ao menos um cliente');
+  const desconto = document.getElementById('nov-desconto').value;
+  if(!desconto) return showToast('Informe o percentual de desconto');
+  if(!confirm(`Confirma o envio para ${qtd} cliente(s)?\n\nEles receberão a mensagem de promoção com ${desconto}% de desconto.`)) return;
+  const extra = document.getElementById('nov-extra').value.trim();
+  let enviados = 0;
+  const clientesSel = DB.clientes.filter(c=>novSelecionados.has(c.id) && c.telefone);
+  if(clientesSel.length===0) return showToast('Nenhum cliente selecionado tem telefone');
+  // Abre WhatsApp um por vez (navegador bloqueia múltiplos popups)
+  enviarProximoNov(clientesSel, 0, desconto, extra);
+}
+function enviarProximoNov(lista, idx, desconto, extra){
+  if(idx >= lista.length){ showToast(`✓ ${lista.length} mensagens abertas`); return; }
+  const c = lista[idx];
+  const fone = onlyDigits(c.telefone);
+  const msg = `Olá, ${c.nome}! 💜\n\nTemos novidades esperando por você nas Lojas Vital! ${extra||'Venha conferir os lançamentos da temporada.'}\n\nE tem mais: você ganhou ${desconto}% de desconto! 🎉\n\nVenha nos visitar hoje e aproveite essa oferta especial. Estamos te esperando! 💜✨\n\n— Lojas Vital`;
+  window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
+  setTimeout(()=> enviarProximoNov(lista, idx+1, desconto, extra), 800);
+}
+
+/* ====================== CASHBACK ====================== */
+let cbSelecionados = new Set();
+function renderCashbackLista(){
+  const pct = parseFloat(document.getElementById('cb-percentual').value)||0;
+  // Clientes que compraram à vista (pix/credito/debito/dinheiro) — excluindo crediário puro
+  const comprasPorCliente = {};
+  DB.vendas.forEach(v=>{
+    if(!v.clienteNome) return;
+    const valorVista = (v.pix||0)+(v.credito||0)+(v.debito||0)+(v.dinheiro||0);
+    if(valorVista<=0) return;
+    if(!comprasPorCliente[v.clienteNome]) comprasPorCliente[v.clienteNome] = {nome:v.clienteNome, total:0, data:v.data, telefone:v.clienteTelefone};
+    comprasPorCliente[v.clienteNome].total += valorVista;
+    if(v.data > comprasPorCliente[v.clienteNome].data) comprasPorCliente[v.clienteNome].data = v.data;
+  });
+  const elegíveis = Object.values(comprasPorCliente).filter(c=>c.telefone).sort((a,b)=>b.total-a.total);
+  const list = document.getElementById('cb-clientes-list');
+  list.innerHTML = elegíveis.length ? elegíveis.map(c=>{
+    const cashback = c.total*(pct/100);
+    const validade = addDays(c.data, 15);
+    return `<div class="checkrow">
+      <input type="checkbox" id="cb-chk-${c.nome.replace(/\s/g,'_')}" ${cbSelecionados.has(c.nome)?'checked':''} onchange="toggleCB('${c.nome}')">
+      <label for="cb-chk-${c.nome.replace(/\s/g,'_')}" style="flex:1; margin:0; font-size:12px; color:var(--ink); cursor:pointer;">
+        ${c.nome}<br><span style="color:var(--ink-dim); font-size:11px;">Compras: ${brl(c.total)} · Cashback: <b style="color:var(--accent)">${brl(cashback)}</b> · válido até ${fmtDate(validade)}</span>
+      </label>
+    </div>`;
+  }).join('') : '<div class="empty">Nenhum cliente elegível com telefone cadastrado</div>';
+  const btn = document.querySelector('#view-cashback .primary');
+  if(btn) btn.textContent = `📲 Enviar cashback para ${cbSelecionados.size} selecionado(s)`;
+}
+function toggleCB(nome){ cbSelecionados.has(nome) ? cbSelecionados.delete(nome) : cbSelecionados.add(nome); renderCashbackLista(); }
+function selecionarTodosCB(val){
+  const pct = parseFloat(document.getElementById('cb-percentual').value)||0;
+  const comprasPorCliente = {};
+  DB.vendas.forEach(v=>{
+    if(!v.clienteNome||!v.clienteTelefone) return;
+    const valorVista=(v.pix||0)+(v.credito||0)+(v.debito||0)+(v.dinheiro||0);
+    if(valorVista>0) comprasPorCliente[v.clienteNome]={nome:v.clienteNome,total:(comprasPorCliente[v.clienteNome]?.total||0)+valorVista,data:v.data,telefone:v.clienteTelefone};
+  });
+  Object.values(comprasPorCliente).filter(c=>c.telefone).forEach(c=> val ? cbSelecionados.add(c.nome) : cbSelecionados.delete(c.nome));
+  renderCashbackLista();
+}
+function confirmarEnvioCB(){
+  const qtd = cbSelecionados.size;
+  if(qtd===0) return showToast('Selecione ao menos um cliente');
+  const pct = parseFloat(document.getElementById('cb-percentual').value)||0;
+  if(pct<=0) return showToast('Informe o percentual de cashback');
+  if(!confirm(`Confirma o envio de cashback para ${qtd} cliente(s) com ${pct}% de cashback?`)) return;
+  const comprasPorCliente = {};
+  DB.vendas.forEach(v=>{
+    if(!v.clienteNome||!v.clienteTelefone) return;
+    const valorVista=(v.pix||0)+(v.credito||0)+(v.debito||0)+(v.dinheiro||0);
+    if(valorVista<=0) return;
+    if(!comprasPorCliente[v.clienteNome]) comprasPorCliente[v.clienteNome]={nome:v.clienteNome,total:0,data:v.data,telefone:v.clienteTelefone};
+    comprasPorCliente[v.clienteNome].total += valorVista;
+    if(v.data > comprasPorCliente[v.clienteNome].data) comprasPorCliente[v.clienteNome].data = v.data;
+  });
+  const lista = Object.values(comprasPorCliente).filter(c=>cbSelecionados.has(c.nome) && c.telefone);
+  enviarProximoCB(lista, 0, pct);
+}
+function enviarProximoCB(lista, idx, pct){
+  if(idx>=lista.length){ showToast(`✓ ${lista.length} mensagens abertas`); return; }
+  const c = lista[idx];
+  const fone = onlyDigits(c.telefone);
+  const cashback = c.total*(pct/100);
+  const validade = addDays(c.data, 15);
+  const msg = `Olá, ${c.nome}! 💜\n\nObrigado por comprar nas Lojas Vital!\n\nTemos uma ótima notícia: você ganhou um cashback de ${brl(cashback)} (${pct}% das suas compras)! 🎉\n\nUse esse cashback na sua próxima visita.\n⚠️ Válido até ${fmtDate(validade)} (15 dias a partir da sua última compra).\n\nEstamos te esperando! 💜✨\n\n— Lojas Vital`;
+  window.open(`https://wa.me/55${fone}?text=${encodeURIComponent(msg)}`, '_blank');
+  setTimeout(()=> enviarProximoCB(lista, idx+1, pct), 800);
 }
 
 /* ====================== CRONOLÓGICO DE VENDAS ====================== */
@@ -1592,22 +1803,48 @@ function renderCronologico(){
   const list = document.getElementById('cron-list');
   if(vendas.length===0){ list.innerHTML='<div class="empty"><span class="ic">📭</span>Nenhuma venda nesta data</div>'; return; }
 
+  // Totais por forma
+  const formasTotais = {pix:0, credito:0, debito:0, dinheiro:0, crediario:0};
+  vendas.forEach(v=>{ formasTotais.pix+=(v.pix||0); formasTotais.credito+=(v.credito||0); formasTotais.debito+=(v.debito||0); formasTotais.dinheiro+=(v.dinheiro||0); formasTotais.crediario+=(v.crediario||0); });
+  const resumoFormas = [
+    {k:'pix',c:'var(--pix)',l:'PIX'},
+    {k:'credito',c:'var(--credito)',l:'Crédito'},
+    {k:'debito',c:'var(--debito)',l:'Débito'},
+    {k:'dinheiro',c:'var(--dinheiro)',l:'Dinheiro'},
+    {k:'crediario',c:'var(--crediario)',l:'Crediário'},
+  ].filter(f=>formasTotais[f.k]>0).map(f=>`<span style="color:${f.c}; font-size:11px; margin-right:10px;">${f.l}: ${brl(formasTotais[f.k])}</span>`).join('');
+
   // Agrupar por vendedora
   const porVendedora = {};
   vendas.forEach(v=>{ if(!porVendedora[v.vendedora]) porVendedora[v.vendedora]=[]; porVendedora[v.vendedora].push(v); });
 
-  list.innerHTML = Object.entries(porVendedora).map(([nome, vv])=>{
+  list.innerHTML = `<div style="padding:8px 0 12px; border-bottom:1px dashed var(--card-border); margin-bottom:10px;">${resumoFormas}</div>` +
+  Object.entries(porVendedora).map(([nome, vv])=>{
     const subtotal = vv.reduce((s,v)=>s+v.total,0);
     return `<div style="margin-bottom:12px;">
       <div style="font-size:12px; color:var(--accent); font-weight:700; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--card-border);">${nome} — ${brl(subtotal)}</div>
-      ${vv.map(v=>`<div class="list-row">
-        <div><div class="l1">${v.produto||v.categoria}</div><div class="l2">${v.categoria}${v.clienteNome?' · '+v.clienteNome:''}</div></div>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <div class="l1">${brl(v.total)}</div>
-          ${(v.clienteTelefone||(v.cliente&&v.cliente.telefone))?`<button class="del-btn" style="color:var(--whats);" onclick="reenviarWhatsApp('${v.id}')">📲</button>`:''}
-          <button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button>
-        </div>
-      </div>`).join('')}
+      ${vv.map(v=>{
+        const formasTxt = [
+          v.pix>0?`<span style="color:var(--pix);font-size:10px;">PIX ${brl(v.pix)}</span>`:'',
+          v.credito>0?`<span style="color:var(--credito);font-size:10px;">Crédito ${brl(v.credito)}</span>`:'',
+          v.debito>0?`<span style="color:var(--debito);font-size:10px;">Débito ${brl(v.debito)}</span>`:'',
+          v.dinheiro>0?`<span style="color:var(--dinheiro);font-size:10px;">Dinheiro ${brl(v.dinheiro)}</span>`:'',
+          v.crediario>0?`<span style="color:var(--crediario);font-size:10px;">Crediário ${brl(v.crediario)}</span>`:'',
+        ].filter(Boolean).join(' ');
+        const cat = (v.categoria||'Outros').trim().toLowerCase().replace(/\b\w/g,l=>l.toUpperCase());
+        return `<div class="list-row">
+          <div>
+            <div class="l1">${v.produto||cat}</div>
+            <div class="l2">${cat}${v.clienteNome?' · '+v.clienteNome:''}</div>
+            <div style="margin-top:3px;">${formasTxt}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div class="l1">${brl(v.total)}</div>
+            ${(v.clienteTelefone||(v.cliente&&v.cliente.telefone))?`<button class="del-btn" style="color:var(--whats);" onclick="reenviarWhatsApp('${v.id}')">📲</button>`:''}
+            <button class="del-btn" onclick="excluirVenda('${v.id}')">🗑️</button>
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
 }
@@ -1620,7 +1857,7 @@ function renderCronologico(){
   populateClientesDatalist();
   populateAutocomplete();
   updateOfflineIndicator();
-  switchView('venda');
+  switchView('fechamento');
 })();
 </script>
 </body>
